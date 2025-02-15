@@ -1,4 +1,4 @@
-package top.boking.searchlineservice;
+package top.boking.fileservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

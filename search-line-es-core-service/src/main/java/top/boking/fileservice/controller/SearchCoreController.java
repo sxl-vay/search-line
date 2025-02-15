@@ -1,4 +1,4 @@
-package top.boking.searchlineservice.controller;
+package top.boking.fileservice.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,4 +22,7 @@ public class SearchCoreController {
         String ip = System.getenv("MY_POD_IP");
         return SlineResult.success(Arrays.asList(ip+":"+port,"file","text"));
     }
+
+
+
 }

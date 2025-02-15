@@ -57,10 +57,20 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!--本地配置-->
         <dependency>
             <groupId>top.boking</groupId>
             <artifactId>line-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>line-base</artifactId>
         </dependency>
     </dependencies>
 </project>

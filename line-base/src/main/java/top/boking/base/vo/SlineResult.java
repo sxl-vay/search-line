@@ -13,7 +13,7 @@ import static top.boking.base.response.ResponseCode.SUCCESS;
 @Setter
 public class SlineResult<T> {
     /**
-     * 状态吗
+     * 状态码
      */
     private String code;
 
@@ -27,6 +27,18 @@ public class SlineResult<T> {
      */
     private String message;
 
+    /**
+     * 服务器节点套接字
+     */
+    private String server;
+
+    {
+        //获取ip
+        String ip = System.getenv("MY_POD_IP");
+        //获取端口号
+        String port = System.getenv("MY_POD_PORT");
+        this.server = ip + ":" + port;
+    }
     /**
      * 数据，可以是任何类型的VO
      */

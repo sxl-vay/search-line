@@ -44,13 +44,6 @@
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
-        <!--    sensitive    -->
-        <dependency>
-            <groupId>com.github.houbb</groupId>
-            <artifactId>sensitive-logback</artifactId>
-            <version>1.7.0</version>
-        </dependency>
-
         <dependency>
             <groupId>top.boking</groupId>
             <artifactId>line-config</artifactId>
