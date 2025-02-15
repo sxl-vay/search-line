@@ -19,6 +19,7 @@
         <module>line-gateway</module>
         <module>line-config</module>
         <module>search-line-file-service</module>
+        <module>line-base</module>
     </modules>
 
     <properties>
@@ -64,7 +65,24 @@
                 <artifactId>search-line-es-core-service</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
+            <dependency>
+                <groupId>top.boking</groupId>
+                <artifactId>line-base</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>2.0.43</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 </project>

@@ -1,7 +1,5 @@
 server:
   port: 8214
-  servlet:
-    context-path: /api
 spring:
   # MySQL??
   datasource:

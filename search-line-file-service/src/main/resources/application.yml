@@ -11,8 +11,6 @@ spring:
     password: root
 server:
   port: 8215
-  servlet:
-    context-path: /api
 # MyBatis??
 mybatis:
   mapper-locations: classpath:mapper/*.xml

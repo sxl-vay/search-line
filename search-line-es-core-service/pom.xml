@@ -63,6 +63,10 @@
             <groupId>top.boking</groupId>
             <artifactId>line-config</artifactId>
         </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>line-base</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
