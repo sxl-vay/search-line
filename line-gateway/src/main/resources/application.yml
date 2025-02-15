@@ -1,0 +1,22 @@
+spring:
+  config:
+    import: classpath:config.yml
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedHeaders: '*'
+            allowedMethods: '*'
+            allowedOrigins: '*'
+      routes:
+        - id: search-line-es-core-service
+          uri: lb://search-line-es-core-service
+          predicates:
+            - Path=/api/search/**
+        - id: search-line-file-service
+          uri: lb://search-line-file-service
+          predicates:
+            - Path=/api/file/**
+  application:
+    name: line-gateway

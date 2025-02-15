@@ -1,0 +1,15 @@
+spring:
+  config:
+    import: nacos:${spring.application.name}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.18.124:8848
+        namespace: 20250215
+      config:
+        server-addr: 192.168.18.124:8848
+        namespace: 20250215
+        file-extension: properties
+        name: ${spring.application.name}
+        import-check:
+          enabled: false

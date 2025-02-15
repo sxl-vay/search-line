@@ -1,0 +1,21 @@
+spring:
+  config:
+    import: classpath:config.yml
+  application:
+    name: search-line-file-service
+  # MySQL??
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://47.101.167.248:3306/search_life?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+server:
+  port: 8215
+  servlet:
+    context-path: /api
+# MyBatis??
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+#  type-aliases-package: com.search.entity
+#  configuration:
+#    map-underscore-to-camel-case: true
