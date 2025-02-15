@@ -11,7 +11,7 @@ CREATE TABLE s_line_file
     gmt_create   DATETIME DEFAULT CURRENT_TIMESTAMP,
     gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     name         VARCHAR(255),
-    file_service VARCHAR(255),
+    store_type   VARCHAR(255),
     suffix       VARCHAR(255),
     file_size    BIGINT
 );
