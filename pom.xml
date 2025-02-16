@@ -20,6 +20,9 @@
         <module>line-config</module>
         <module>search-line-file-service</module>
         <module>line-base</module>
+        <module>search-line-user-service</module>
+        <module>line-user-core</module>
+        <module>line-common</module>
     </modules>
 
     <properties>

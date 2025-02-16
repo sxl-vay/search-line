@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -9,13 +7,16 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>line-base</artifactId>
+    <artifactId>line-user-core</artifactId>
+    <packaging>jar</packaging>
+
+    <name>line-user-core</name>
+    <url>http://maven.apache.org</url>
 
     <properties>
-        <maven.compiler.source>23</maven.compiler.source>
-        <maven.compiler.target>23</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
@@ -45,6 +46,10 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>5.8.22</version>
+        </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>line-base</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -18,5 +18,9 @@ spring:
           uri: lb://search-line-file-service
           predicates:
             - Path=/api/file/**
+        - id: search-line-user-service
+          uri: lb://search-line-user-service
+          predicates:
+            - Path=/api/user/**
   application:
     name: line-gateway
