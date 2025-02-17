@@ -2,6 +2,7 @@ package top.boking.fileservice.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.boking.base.vo.SlineResult;
@@ -22,6 +23,12 @@ public class SearchCoreController {
         String ip = System.getenv("MY_POD_IP");
         return SlineResult.success(Arrays.asList(ip+":"+port,"file","text"));
     }
+    @PostMapping("/all")
+    public SlineResult<String> getAll() {
+        //todo 后续实现all接口
+        return SlineResult.success("test");
+    }
+
 
 
 
