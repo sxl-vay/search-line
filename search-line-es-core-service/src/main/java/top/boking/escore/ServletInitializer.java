@@ -1,4 +1,4 @@
-package top.boking.fileservice;
+package top.boking.escore;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

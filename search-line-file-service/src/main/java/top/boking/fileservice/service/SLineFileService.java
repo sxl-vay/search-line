@@ -7,36 +7,40 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import top.boking.fileservice.domain.entity.SLineFile;
 import top.boking.fileservice.mapper.SLineFileMapper;
-import top.boking.fileservice.store.IFileStore;
+import top.boking.fileservice.mq.msgholder.TransactionHolder;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 @Slf4j
 public class SLineFileService extends ServiceImpl<SLineFileMapper, SLineFile> {
     //从Spring bean中获取IFileStore的所有实现类整合到fileStores这个List中
-    private final List<IFileStore> fileStores;
+    private final FileMessageService fileMessageService;
 
-    public SLineFileService(List<IFileStore> fileStores) {
-        this.fileStores = fileStores;
+    public SLineFileService(FileMessageService fileMessageService) {
+        this.fileMessageService = fileMessageService;
     }
 
     public SLineFile uploadFile(MultipartFile file) throws IOException {
         SLineFile sLineFile = buildSlineFile(file);
         //获取当前工程的resources目录
         //后续继续优化
-        boolean upload = false;
-        for (IFileStore fileStore : fileStores) {
-            upload = fileStore.upload(sLineFile.getStoreFileName(), file.getInputStream());
-            sLineFile.setStoreType(fileStore.getFileStoreType());
-            if (upload) break;
+
+        TransactionHolder.setMultipartFile(file);
+        try {
+            log.info("事务消息发送中，sLineFile:{}", sLineFile);
+            fileMessageService.sendTransactionMessage(sLineFile);
+        } catch (Exception e) {
+            log.error("事务消息发送失败，回滚文件记录，sLineFile:{}", sLineFile);
+            // 如果事务消息发送失败，则回滚文件记录
+            this.removeById(sLineFile.getId());
+            throw e;
+        } finally {
+            log.info("事务消息发送完成，清理事务消息，sLineFile:{}", sLineFile);
+            TransactionHolder.clear();
         }
-        if (!upload) {
-            throw new RuntimeException("文件上传失败");
-        }
-        this.save(sLineFile);
-        log.info("sLineFile:{}", sLineFile);
+        // 发送事务消息，确保文件记录的保存和消息发送的原子性
+        log.info("文件上传成功，事务消息已发送，sLineFile:{}", sLineFile);
         return sLineFile;
 
     }

@@ -1,4 +1,4 @@
-package top.boking.fileservice;
+package top.boking.escore;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
