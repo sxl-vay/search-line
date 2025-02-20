@@ -20,6 +20,19 @@ CREATE TABLE s_line_file
     file_size    BIGINT
 );
 
+
+create table file_transfer_record
+(
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    deleted      INT      DEFAULT 0,
+    lock_version INT      DEFAULT 0,
+    gmt_create   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    file_id      BIGINT,
+    UNIQUE (file_id)
+);
+
+
 -- 用户信息表
 CREATE TABLE `users`
 (

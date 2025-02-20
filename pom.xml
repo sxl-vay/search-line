@@ -21,8 +21,10 @@
         <module>search-line-file-service</module>
         <module>line-base</module>
         <module>search-line-user-service</module>
-        <module>line-user-core</module>
         <module>line-common</module>
+        <module>search-line-interface</module>
+        <module>search-line-interface/search-line-interface-es</module>
+        <module>line-common/search-line-file-core</module>
     </modules>
 
     <properties>

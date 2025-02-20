@@ -7,13 +7,8 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>line-common</artifactId>
+    <artifactId>search-line-interface</artifactId>
     <packaging>pom</packaging>
-    <modules>
-        <module>search-line-sa-token</module>
-        <module>search-line-user-core</module>
-        <module>search-line-dubbo</module>
-    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
