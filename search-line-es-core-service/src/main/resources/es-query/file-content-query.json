@@ -1,0 +1,20 @@
+{
+  "query": {
+    "match": {
+      "file_content": {
+        "query": "${keyword}",
+        "analyzer": "ik_smart_pinyin"
+      }
+    }
+  },
+  "highlight": {
+    "pre_tags": ["<em>"],
+    "post_tags": ["</em>"],
+    "fields": {
+      "file_content": {
+        "fragment_size": 150,
+        "number_of_fragments": 3
+      }
+    }
+  }
+}

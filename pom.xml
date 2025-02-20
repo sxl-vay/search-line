@@ -23,6 +23,8 @@
         <module>search-line-user-service</module>
         <module>line-user-core</module>
         <module>line-common</module>
+        <module>line-common-jar</module>
+        <module>line-common-jar/line-file-jar</module>
     </modules>
 
     <properties>

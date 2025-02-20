@@ -1,6 +1,6 @@
 -- 创建数据库
 
-drop database search_line;
+drop database if exists search_line;
 
 create database if not exists `search_line` default character set utf8mb4;
 -- 使用数据库
@@ -16,6 +16,7 @@ CREATE TABLE s_line_file
     gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     name         VARCHAR(255),
     store_type   VARCHAR(255),
+    store_path   text,
     suffix       VARCHAR(255),
     file_size    BIGINT
 );

@@ -86,6 +86,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>line-file-jar</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- RocketMQ依赖 -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
