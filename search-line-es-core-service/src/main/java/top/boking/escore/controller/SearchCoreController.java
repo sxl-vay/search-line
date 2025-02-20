@@ -29,7 +29,4 @@ public class SearchCoreController {
         return SlineResult.success("test");
     }
 
-
-
-
 }

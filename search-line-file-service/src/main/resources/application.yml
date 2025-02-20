@@ -9,6 +9,10 @@ spring:
     url: jdbc:mysql://47.101.167.248:3306/search_line?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: root
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 server:
   port: 8215
 # MyBatis配置

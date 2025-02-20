@@ -79,5 +79,10 @@
             <groupId>top.boking</groupId>
             <artifactId>line-base</artifactId>
         </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>search-line-file-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

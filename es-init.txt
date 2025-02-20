@@ -1,0 +1,57 @@
+
+PUT /knowledge_base
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "ik_smart_pinyin": {
+          "type": "custom",
+          "tokenizer": "ik_smart",
+          "filter": ["pinyin_filter"]
+        }
+      },
+      "filter": {
+        "pinyin_filter": {
+          "type": "pinyin",
+          "keep_first_letter": true,
+          "keep_separate_first_letter": true
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "fileName": {
+        "type": "text",
+        "analyzer": "ik_smart_pinyin",
+        "fields": {
+          "keyword": { "type": "keyword" }
+        }
+      },
+      "fileContent": {
+        "type": "text",
+        "analyzer": "ik_smart_pinyin"
+      },
+      "fileType": { "type": "keyword" },
+      "uploadTime": { "type": "date" },
+      "author": {
+        "type": "text",
+        "analyzer": "ik_smart",
+        "fields": {
+          "keyword": { "type": "keyword" }
+        }
+      },
+      "attachment": {
+        "type": "binary"
+      },
+      "metadata": {
+        "type": "object",
+        "properties": {
+          "creator": { "type": "keyword" },
+          "createDate": { "type": "date" },
+          "pages": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

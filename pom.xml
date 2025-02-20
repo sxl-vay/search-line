@@ -35,7 +35,7 @@
 
         <spring-cloud.version>2023.0.0</spring-cloud.version>
         <spring-cloud-alibaba.version>2023.0.1.2</spring-cloud-alibaba.version>
-
+        <mybatis-plus-spring-boot3-starter.version>3.5.5</mybatis-plus-spring-boot3-starter.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -54,7 +54,11 @@
                 <scope>import</scope>
             </dependency>
 
-
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus-spring-boot3-starter.version}</version>
+            </dependency>
             <dependency>
                 <groupId>top.boking</groupId>
                 <artifactId>line-config</artifactId>

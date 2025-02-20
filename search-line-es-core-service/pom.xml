@@ -86,6 +86,7 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
+
         <!-- RocketMQ依赖 -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
@@ -95,6 +96,11 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>search-line-file-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
