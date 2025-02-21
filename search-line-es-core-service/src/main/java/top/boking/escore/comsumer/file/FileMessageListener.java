@@ -11,7 +11,6 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.pdf.PDFParser;
 import org.apache.tika.sax.BodyContentHandler;
-import org.apache.tika.sax.WriteOutContentHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import top.boking.escore.consts.ESMQConst;
@@ -22,6 +21,7 @@ import top.boking.escore.infrastructure.mapper.FileTransferRecordMapper;
 import top.boking.file.consts.MQConst;
 import top.boking.file.domain.entity.SLineFile;
 import top.boking.file.service.SLineFileCoreService;
+import top.boking.lock.DistributeLock;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,12 +55,16 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
 
     /**
      *
+     * 1. 加锁 文件id的分布式锁
+     * 2. 判定 校验文件是否已经插入
+     * 3. 插入 es
      * 分布式场景下防止重复消费问题
      * 同一个mq消息可能投递到两个节点上去
      * @param event
      */
     @Override
     @Transactional(rollbackFor = Exception.class )
+    @DistributeLock(scene = "file_transfer_record",key = "shxl")
     public void onMessage(SLineFile event) {
         QueryWrapper<FileTransferRecord> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("file_id", event.getId());
@@ -69,7 +73,7 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
             log.info("文件已存在，跳过处理{}", event);
             return;
         }
-        fileTransferRecordMapper.insert(FileTransferRecord.create(99L));
+        fileTransferRecordMapper.insert(FileTransferRecord.create(event.getId()));
         log.info("es:接收到文件服务消息：{}", event);
 
         List<KnowledgeBase> knowledgeBases = Arrays.asList(event)

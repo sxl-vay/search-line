@@ -1,6 +1,6 @@
 spring:
   config:
-    import: nacos:${spring.application.name}
+    import: nacos:${spring.application.name},nacos:config.yml
   cloud:
     nacos:
       discovery:

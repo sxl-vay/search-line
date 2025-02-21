@@ -25,6 +25,7 @@
         <module>search-line-interface</module>
         <module>search-line-interface/search-line-interface-es</module>
         <module>line-common/search-line-file-core</module>
+        <module>line-common/search-line-cache</module>
     </modules>
 
     <properties>
