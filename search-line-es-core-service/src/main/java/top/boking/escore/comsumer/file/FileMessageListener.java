@@ -1,8 +1,9 @@
-package top.boking.escore.comsumer;
+package top.boking.escore.comsumer.file;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
@@ -10,10 +11,14 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.pdf.PDFParser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.apache.tika.sax.WriteOutContentHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import top.boking.escore.consts.ESMQConst;
 import top.boking.escore.consts.IndexConsts;
+import top.boking.escore.domain.entity.FileTransferRecord;
 import top.boking.escore.domain.entity.KnowledgeBase;
+import top.boking.escore.infrastructure.mapper.FileTransferRecordMapper;
 import top.boking.file.consts.MQConst;
 import top.boking.file.domain.entity.SLineFile;
 import top.boking.file.service.SLineFileCoreService;
@@ -39,19 +44,32 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
 
     private final SLineFileCoreService sLineFileCoreService;
 
-    public FileMessageListener(ElasticsearchClient elasticsearchClient, SLineFileCoreService sLineFileCoreService) {
+    private final FileTransferRecordMapper fileTransferRecordMapper;
+
+    public FileMessageListener(ElasticsearchClient elasticsearchClient, SLineFileCoreService sLineFileCoreService, FileTransferRecordMapper fileTransferRecordMapper) {
         this.elasticsearchClient = elasticsearchClient;
         this.sLineFileCoreService = sLineFileCoreService;
+        this.fileTransferRecordMapper = fileTransferRecordMapper;
     }
 
-    //幂等控制
+
+    /**
+     *
+     * 分布式场景下防止重复消费问题
+     * 同一个mq消息可能投递到两个节点上去
+     * @param event
+     */
     @Override
+    @Transactional(rollbackFor = Exception.class )
     public void onMessage(SLineFile event) {
-        if (sLineFileCoreService.checkFileExist(event.getId())) {
+        QueryWrapper<FileTransferRecord> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("file_id", event.getId());
+        Long l = fileTransferRecordMapper.selectCount(queryWrapper);
+        if (l > 0) {
             log.info("文件已存在，跳过处理{}", event);
             return;
         }
-        //todo 将文件服务消息中文件内容添加到es中
+        fileTransferRecordMapper.insert(FileTransferRecord.create(99L));
         log.info("es:接收到文件服务消息：{}", event);
 
         List<KnowledgeBase> knowledgeBases = Arrays.asList(event)
@@ -81,12 +99,12 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
             // 执行批量写入
             BulkResponse response = elasticsearchClient.bulk(builder.build());
             if (response.errors()) {
-                log.error("批量写入ES出现错误：{}", response.items());
+                throw new RuntimeException("ES批量写入异常");
             } else {
                 log.info("成功批量写入{}条数据到ES", knowledgeBases.size());
             }
         } catch (IOException e) {
-            log.error("ES批量写入异常", e);
+            throw new RuntimeException("ES批量写入时IO异常:",e);
         }
     }
 
@@ -98,10 +116,9 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
     public static String parsePdf(File filePath) throws Exception{
         InputStream input = new FileInputStream(filePath);
         // 1. 创建 Tika 解析器
-        BodyContentHandler handler = new BodyContentHandler();
+        BodyContentHandler handler = new BodyContentHandler(500000);
         Metadata metadata = new Metadata();
         PDFParser pdfParser = new PDFParser();
-
         // 2. 解析 PDF
         pdfParser.parse(input, handler, metadata, new ParseContext());
 
