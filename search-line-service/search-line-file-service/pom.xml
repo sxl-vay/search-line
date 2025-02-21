@@ -1,31 +1,42 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>top.boking</groupId>
-        <artifactId>Search-Line</artifactId>
+        <artifactId>search-line-service</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>search-line-user-service</artifactId>
-    <packaging>jar</packaging>
-
-    <name>search-line-user-service</name>
-    <url>http://maven.apache.org</url>
-
+    <artifactId>search-line-file-service</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <properties>
+        <maven.compiler.source>23</maven.compiler.source>
+        <maven.compiler.target>23</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
+        <!-- RocketMQ依赖 -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -53,6 +64,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!--本地配置-->
         <dependency>
             <groupId>top.boking</groupId>
@@ -60,7 +77,11 @@
         </dependency>
         <dependency>
             <groupId>top.boking</groupId>
-            <artifactId>search-line-user-core</artifactId>
+            <artifactId>line-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>search-line-file-core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

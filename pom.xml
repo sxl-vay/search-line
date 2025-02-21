@@ -15,17 +15,15 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>search-line-es-core-service</module>
         <module>line-gateway</module>
         <module>line-config</module>
-        <module>search-line-file-service</module>
         <module>line-base</module>
-        <module>search-line-user-service</module>
         <module>line-common</module>
         <module>search-line-interface</module>
         <module>search-line-interface/search-line-interface-es</module>
         <module>line-common/search-line-file-core</module>
         <module>line-common/search-line-cache</module>
+        <module>search-line-service</module>
     </modules>
 
     <properties>
