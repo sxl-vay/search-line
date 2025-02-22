@@ -5,4 +5,5 @@ public class MQConst {
     public static final String FILE_TRANSACTION_GROUP = "file-transaction-group";
     public static final String FILE_TRANSACTION_TAG = "file-transaction-tag";
     public static final String FILE_TRANSACTION_GROUP_TAG = FILE_TRANSACTION_GROUP + ":" + FILE_TRANSACTION_TAG;
+    public static final String DLQ_PREFIX = "%DLQ%";
 }

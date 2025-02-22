@@ -33,22 +33,20 @@ import java.util.stream.Collectors;
 
 @Component
 @RocketMQMessageListener(
-        consumerGroup = ESMQConst.COMSUMERGROUP
+        consumerGroup = ESMQConst.FILE_SYNC_COMSUMERGROUP
         , topic = (MQConst.FILE_TRANSACTION_TOPIC)
-        , maxReconsumeTimes = 2
+        , maxReconsumeTimes = 1
 )
 @Slf4j
 public class FileMessageListener implements RocketMQListener<SLineFile> {
 
     private final ElasticsearchClient elasticsearchClient;
 
-    private final SLineFileCoreService sLineFileCoreService;
 
     private final FileTransferRecordMapper fileTransferRecordMapper;
 
-    public FileMessageListener(ElasticsearchClient elasticsearchClient, SLineFileCoreService sLineFileCoreService, FileTransferRecordMapper fileTransferRecordMapper) {
+    public FileMessageListener(ElasticsearchClient elasticsearchClient, FileTransferRecordMapper fileTransferRecordMapper) {
         this.elasticsearchClient = elasticsearchClient;
-        this.sLineFileCoreService = sLineFileCoreService;
         this.fileTransferRecordMapper = fileTransferRecordMapper;
     }
 
