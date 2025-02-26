@@ -1,0 +1,18 @@
+dubbo:
+  application:
+    name: ${spring.application.name}
+    logger: slf4j
+  protocol:
+    port: 50052
+    name: tri
+  registry:
+    address: nacos://192.168.40.95:8848?username=nacos&password=nacos
+    parameters:
+      namespace: 20250222
+      group: dubbo #首次启动前务必修改成你自己的
+  consumer:
+    timeout: 6000000
+    check: false #全局禁用dubbo启动校验
+  #    loadbalance: shxl
+  config-center:
+    timeout: 6000000

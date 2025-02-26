@@ -107,5 +107,10 @@
             <artifactId>search-line-lock</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>search-line-dubbo</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
