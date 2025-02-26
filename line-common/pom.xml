@@ -12,7 +12,7 @@
     <modules>
         <module>search-line-sa-token</module>
         <module>search-line-user-core</module>
-        <module>search-line-dubbo</module>
+        <module>search-line-comment</module>
         <module>search-line-lock</module>
     </modules>
 

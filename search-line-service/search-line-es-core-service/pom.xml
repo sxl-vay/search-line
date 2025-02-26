@@ -109,7 +109,7 @@
         </dependency>
         <dependency>
             <groupId>top.boking</groupId>
-            <artifactId>search-line-dubbo</artifactId>
+            <artifactId>search-line-comment</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

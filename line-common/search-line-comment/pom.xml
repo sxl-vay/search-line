@@ -7,30 +7,26 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>search-line-dubbo</artifactId>
+    <artifactId>search-line-comment</artifactId>
 
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-nacos-spring-boot-starter</artifactId>
-            <version>3.2.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-spring-boot-starter</artifactId>
-            <version>3.2.10</version>
-        </dependency>
 
         <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-bom</artifactId>
-            <version>3.2.10</version>
-            <type>pom</type>
-            <scope>import</scope>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>line-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>search-line-cache</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
