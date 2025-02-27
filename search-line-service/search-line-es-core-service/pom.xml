@@ -10,7 +10,7 @@
     <groupId>top.boking</groupId>
     <artifactId>search-line-es-core-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>search-line-service</name>
     <description>search-line-service</description>
     <properties>
@@ -113,4 +113,16 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
+    <!-- pom.xml 示例 -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>top.boking.escore.ESServiceApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

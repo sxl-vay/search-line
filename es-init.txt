@@ -41,9 +41,6 @@ PUT /knowledge_base
           "keyword": { "type": "keyword" }
         }
       },
-      "attachment": {
-        "type": "binary"
-      },
       "metadata": {
         "type": "object",
         "properties": {
