@@ -4,6 +4,7 @@ spring:
   cloud:
     nacos:
       discovery:
+        ip: 2.0.20.1
         server-addr: 192.168.40.95:8848
         namespace: 20250215
       config:

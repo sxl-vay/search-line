@@ -2,6 +2,7 @@ package top.boking.escore.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -13,6 +14,8 @@ import java.util.Date;
 @Data
 @Document(indexName = IndexConsts.FILE_KNOWLEDGE_INDEX)
 public class KnowledgeBase {
+    @Id
+    private String id;
     @Field(type = FieldType.Text, analyzer = "ik_smart_pinyin")
     private String fileName;
 

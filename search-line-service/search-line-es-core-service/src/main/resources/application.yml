@@ -17,3 +17,7 @@ mybatis:
   type-aliases-package: com.search.entity
   configuration:
     map-underscore-to-camel-case: true
+logging:
+  level:
+    org.elasticsearch.client: DEBUG
+    org.springframework.data.elasticsearch.core: DEBUG
