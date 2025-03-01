@@ -14,3 +14,55 @@ spring:
         name: ${spring.application.name}
         import-check:
           enabled: false
+  data:
+    redis:
+      host: 2.0.20.33
+      port: 6379
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://47.101.167.248:3306/search_line?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+  redis:
+    redisson:
+      config: |
+        singleServerConfig:
+          idleConnectionTimeout: 10000
+          connectTimeout: 10000
+          timeout: 3000
+          retryAttempts: 3
+          retryInterval: 1500
+          subscriptionsPerConnection: 5
+          clientName: null
+          address: "redis://192.168.18.124:6379"
+          subscriptionConnectionMinimumIdleSize: 1
+          subscriptionConnectionPoolSize: 50
+          connectionMinimumIdleSize: 24
+          connectionPoolSize: 64
+          database: 0
+          dnsMonitoringInterval: 5000
+        threads: 16
+        nettyThreads: 32
+        codec: !<org.redisson.codec.JsonJacksonCodec> {}
+        transportMode: "NIO"
+jetcache:
+  statIntervalMinutes: 1
+  areaInCacheName: false
+  local:
+    default:
+      type: caffeine
+      keyConvertor: fastjson2
+  remote:
+    default:
+      type: redisson
+      keyConvertor: fastjson2
+      broadcastChannel: ${spring.application.name}
+      keyPrefix: ${spring.application.name}
+      valueEncoder: java
+      valueDecoder: java
+      defaultExpireInMillis: 5000
+rocketmq:
+  name-server: 192.168.40.95:9876
+  producer:
+    group: file-service-producer-group
+    send-message-timeout: 3000
