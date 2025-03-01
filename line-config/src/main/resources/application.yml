@@ -1,5 +1,0 @@
-spring:
-  cloud:
-    nacos:
-      discovery:
-        ip: 2.0.20.1

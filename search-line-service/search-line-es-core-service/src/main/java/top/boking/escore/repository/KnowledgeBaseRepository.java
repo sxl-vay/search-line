@@ -16,8 +16,15 @@ public interface KnowledgeBaseRepository extends ElasticsearchRepository<Knowled
     Page<KnowledgeBase> findByFileNameContaining(String fileName, Pageable pageable);
 
     // 根据 fileContent 进行全文检索
-    @Query("{\"match\": {\"fileContent\": {\"query\": \"?0\", \"analyzer\": \"ik_smart_pinyin\"}}}")
-    List<KnowledgeBase> findByFileContentContaining(String content);
+    @Query("""
+            {
+                "multi_match": {
+                  "query": "?0",
+                  "fields": ["fileContent", "fileName"]
+                }
+              }
+            """)
+    List<KnowledgeBase> constomSearch(String content);
 
     // 根据文件类型查询
     List<KnowledgeBase> findByFileType(String fileType);
