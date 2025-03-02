@@ -8,4 +8,4 @@ ENV JAVA_OPTS="-Xms512m -Xmx1024m"
 
 EXPOSE 8214
 
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar"]
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} --add-opens java.base/java.lang=ALL-UNNAMED -jar /app/app.jar"]

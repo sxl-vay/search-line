@@ -72,5 +72,18 @@ VALUES (29, '2024-05-26 12:07:38', '2024-06-10 14:14:20', '藏家_zH9sQA0bob1', 
 
 
 
+CREATE TABLE `dead_letter_record`
+(
+    `id`            bigint       NOT NULL AUTO_INCREMENT,
+    `message_id`    varchar(255) NOT NULL,
+    `message_body`  text,
+    `topic`         varchar(255),
+    `retry_times`   int,
+    `error_message` text,
+    `create_time`   datetime,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 

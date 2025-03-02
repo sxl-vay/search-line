@@ -58,6 +58,7 @@ public class KnowledgeBase {
 
     public static KnowledgeBase convert(SLineFile file) {
         KnowledgeBase knowledgeBase = new KnowledgeBase();
+        knowledgeBase.setId(file.getId().toString());
         knowledgeBase.setFileName(file.getName());
         knowledgeBase.setFileType(file.getSuffix());
         knowledgeBase.setUploadTime(file.getGmtCreate());

@@ -19,6 +19,6 @@ public class SLineFile extends BaseEntity {
     private Long owner;
 
     public String getStoreFileName() {
-        return this.getId() +"-"+name;
+        return this.getId() + "." + suffix;
     }
 }
