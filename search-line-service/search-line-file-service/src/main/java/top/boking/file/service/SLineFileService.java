@@ -8,7 +8,6 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import top.boking.file.consts.MQConst;
 import top.boking.file.domain.entity.SLineFile;
@@ -26,7 +25,6 @@ public class SLineFileService extends SLineFileCoreService {
 
     public SLineFile uploadFile(MultipartFile file){
         SLineFile sLineFile = buildSlineFile(file);
-        this.save(sLineFile);
         //获取当前工程的resources目录
         if (!file.isEmpty()) {
             log.info("文件上传中，sLineFile:{}", sLineFile);

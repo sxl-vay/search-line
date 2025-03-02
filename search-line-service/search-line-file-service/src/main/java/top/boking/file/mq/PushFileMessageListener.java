@@ -39,28 +39,44 @@ public class PushFileMessageListener implements RocketMQLocalTransactionListener
         SLineFile sLineFile = (SLineFile) arg;
         processingFiles.add(sLineFile.getId());
         try {
-            log.info("事务消息执行本地事务，文件ID：{}",sLineFile.getId());
+            //获取输入流
             MultipartFile file = TransactionHolder.getMultipartFileHolder();
             if (file == null) {
                 log.error("事务消息为空，事务回滚");
                 return RocketMQLocalTransactionState.ROLLBACK;
             }
-            sLineFile.setStoreType(fileStore.getFileStoreType());
-            sLineFile.setStorePath(fileStore.getFileStorePath());
-            boolean upload = fileStore.upload(sLineFile, file);
-            if (!upload) {
-                return RocketMQLocalTransactionState.ROLLBACK;
-            }
-            // 执行本地事务：保存文件记录
+            //1.业务处理
+            postBusinessHandler(sLineFile);
+            //2.上传文件到oss
+            fileStore.upload(sLineFile, file);
             log.info("本地事务执行成功，文件ID：{}", sLineFile.getId());
+
+            //后置处理，异常不影响主业务流程
+            afterHandler(sLineFile);
         } finally {
             processingFiles.remove(sLineFile.getId());
         }
+        // 如果执行时间超过阈值，则返回ROLLBACK
         long spentTime = System.currentTimeMillis() - startTime;
         if (spentTime > timeout) {
             return RocketMQLocalTransactionState.ROLLBACK;
         }
         return RocketMQLocalTransactionState.COMMIT;
+    }
+
+    private void afterHandler(SLineFile sLineFile) {
+        try {
+            sLineFileService.updateById(sLineFile);
+        } catch (Exception e) {
+            log.error("更新文件路径异常:{}", sLineFile);
+        }
+    }
+
+    private void postBusinessHandler(SLineFile sLineFile) {
+        sLineFileService.save(sLineFile);
+        log.info("事务消息执行本地事务，文件ID：{}", sLineFile.getId());
+        sLineFile.setStoreType(fileStore.getFileStoreType());
+        sLineFile.setStorePath(fileStore.getFileStorePath());
     }
 
     @Override
