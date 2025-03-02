@@ -1,7 +1,9 @@
 #!/bin/bash
+# 推送jar包到服务器执行 目前推送的gateway
+
 
 # 定义远程服务器信息
-REMOTE_IP="192.168.40.95"
+REMOTE_IP="192.168.42.106"
 REMOTE_USER="root"
 REMOTE_PASSWORD="root"
 
@@ -17,10 +19,30 @@ if [ ! -f "$LOCAL_JAR_PATH" ]; then
     exit 1
 fi
 
-# 传输 JAR 文件到远程服务器
-echo "正在传输 JAR 文件到远程服务器..."
+# 删除远程服务器上的旧 JAR 文件
+echo "正在删除远程服务器上的旧 JAR 文件..."
 /usr/bin/expect <<EOF
 set timeout 20
+spawn ssh $REMOTE_USER@$REMOTE_IP
+expect {
+    "yes/no" { send "yes\r"; exp_continue }
+    "password:" { send "$REMOTE_PASSWORD\r" }
+}
+expect "root@"
+send "rm -f $REMOTE_JAR_PATH\r"
+expect "root@"
+send "exit\r"
+expect eof
+EOF
+
+if [ $? -ne 0 ]; then
+    echo "警告：删除旧 JAR 文件失败，可能是文件不存在。"
+fi
+
+# 传输新的 JAR 文件到远程服务器
+echo "正在传输新的 JAR 文件到远程服务器..."
+/usr/bin/expect <<EOF
+set timeout 100
 spawn scp $LOCAL_JAR_PATH $REMOTE_USER@$REMOTE_IP:$REMOTE_JAR_PATH
 expect {
     "yes/no" { send "yes\r"; exp_continue }
@@ -35,7 +57,7 @@ if [ $? -ne 0 ]; then
 fi
 echo "JAR 文件传输完成。"
 
-# 连接到远程服务器并执行命令
+# 连接到远程服务器并启动 JAR 文件
 echo "正在连接到远程服务器并启动 JAR 文件..."
 /usr/bin/expect <<EOF
 set timeout 20
@@ -45,7 +67,7 @@ expect {
     "password:" { send "$REMOTE_PASSWORD\r" }
 }
 expect "root@"
-send "nohup java -jar $REMOTE_JAR_PATH > /dev/null 2>&1 &\r"
+send "nohup /usr/local/jdk/jdk-23.0.2/bin/java -jar $REMOTE_JAR_PATH --server.port=8089 > /dev/null 2>&1 &\r"
 expect "root@"
 send "exit\r"
 expect eof
