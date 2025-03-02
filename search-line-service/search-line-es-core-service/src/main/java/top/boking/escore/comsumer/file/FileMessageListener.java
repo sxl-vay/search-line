@@ -1,13 +1,7 @@
 package top.boking.escore.comsumer.file;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.BulkRequest;
-import co.elastic.clients.elasticsearch.core.BulkResponse;
-import co.elastic.clients.elasticsearch.core.CreateRequest;
-import co.elastic.clients.elasticsearch.core.CreateResponse;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.minio.GetObjectResponse;
-import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
@@ -21,26 +15,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 import top.boking.escore.consts.ESMQConst;
-import top.boking.escore.consts.IndexConsts;
 import top.boking.escore.domain.entity.FileTransferRecord;
 import top.boking.escore.domain.entity.KnowledgeBase;
 import top.boking.escore.infrastructure.mapper.FileTransferRecordMapper;
 import top.boking.escore.repository.KnowledgeBaseRepository;
 import top.boking.file.consts.MQConst;
 import top.boking.file.domain.entity.SLineFile;
-import top.boking.file.service.SLineFileCoreService;
 import top.boking.file.utils.MinioUtils;
 import top.boking.lock.DistributeLock;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RocketMQMessageListener(
@@ -51,16 +36,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FileMessageListener implements RocketMQListener<SLineFile> {
 
-    private final ElasticsearchClient elasticsearchClient;
-
     private final FileTransferRecordMapper fileTransferRecordMapper;
 
     private final MinioUtils minioUtils;
 
     private final KnowledgeBaseRepository knowledgeBaseRepository;
 
-    public FileMessageListener(ElasticsearchClient elasticsearchClient, FileTransferRecordMapper fileTransferRecordMapper, MinioUtils minioUtils, KnowledgeBaseRepository knowledgeBaseRepository) {
-        this.elasticsearchClient = elasticsearchClient;
+    public FileMessageListener(FileTransferRecordMapper fileTransferRecordMapper, MinioUtils minioUtils, KnowledgeBaseRepository knowledgeBaseRepository) {
         this.fileTransferRecordMapper = fileTransferRecordMapper;
         this.minioUtils = minioUtils;
         this.knowledgeBaseRepository = knowledgeBaseRepository;
@@ -103,7 +85,9 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
                     .build();
             CreateResponse createResponse = elasticsearchClient.create(createRequest);*/
             KnowledgeBase save = knowledgeBaseRepository.save(knowledgeBase, RefreshPolicy.IMMEDIATE);
-            log.info("ES写入成功:{}", save);
+            if (log.isDebugEnabled()) {
+                log.debug("ES写入成功:{}", save);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -115,14 +99,12 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
      * @return 提取的文本内容
      */
     public static String parsePdf(InputStream input) throws TikaException, IOException, SAXException {
-//        InputStream input = new FileInputStream(filePath);
         // 1. 创建 Tika 解析器
         BodyContentHandler handler = new BodyContentHandler(500000);
         Metadata metadata = new Metadata();
         PDFParser pdfParser = new PDFParser();
         // 2. 解析 PDF
         pdfParser.parse(input, handler, metadata, new ParseContext());
-
         // 3. 返回解析后的文本
         return handler.toString();
     }

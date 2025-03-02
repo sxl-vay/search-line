@@ -45,9 +45,6 @@ public class MinioFileStore implements IFileStore{
             log.error("minio上传文件失败", e);
             return false;
         }
-
-
-
         return true;
     }
 
@@ -63,7 +60,6 @@ public class MinioFileStore implements IFileStore{
 
     @Override
     public File getFile(SLineFile sLineFile) {
-
         return null;
     }
 

@@ -6,7 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 import top.boking.base.vo.SlineResult;
 import top.boking.file.domain.entity.SLineFile;
 import top.boking.file.domain.respose.SlineFileRespose;
-import top.boking.file.service.FileMessageService;
 import top.boking.file.service.SLineFileService;
 
 import java.io.IOException;
@@ -16,9 +15,6 @@ import java.io.IOException;
 public class FileStoreController {
     @Autowired
     private SLineFileService sLineFileService;
-
-    @Autowired
-    private FileMessageService fileMessageService;
 
     @PostMapping("/upload")
     public SlineResult<SlineFileRespose> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
