@@ -57,8 +57,8 @@ if [ $? -ne 0 ]; then
 fi
 echo "JAR 文件传输完成。"
 
-# 连接到远程服务器并启动 JAR 文件
-echo "正在连接到远程服务器并启动 JAR 文件..."
+# 连接到远程服务器，先执行kill.sh，然后启动新的JAR文件
+echo "正在连接到远程服务器..."
 /usr/bin/expect <<EOF
 set timeout 20
 spawn ssh $REMOTE_USER@$REMOTE_IP
@@ -67,6 +67,10 @@ expect {
     "password:" { send "$REMOTE_PASSWORD\r" }
 }
 expect "root@"
+# 执行kill.sh脚本
+send "sh /usr/local/jar/kill.sh\r"
+expect "root@"
+# 启动新的JAR文件
 send "nohup /usr/local/jdk/jdk-23.0.2/bin/java -jar $REMOTE_JAR_PATH --server.port=8089 > /dev/null 2>&1 &\r"
 expect "root@"
 send "exit\r"
@@ -77,4 +81,4 @@ if [ $? -ne 0 ]; then
     echo "错误：远程执行命令失败！"
     exit 1
 fi
-echo "远程启动 JAR 文件完成。"
+echo "远程服务重启完成。"
