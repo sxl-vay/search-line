@@ -10,6 +10,11 @@
     <artifactId>search-line-service</artifactId>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>search-line-file-service</module>
+        <module>search-line-user-service</module>
+        <module>search-line-es-core-service</module>
+    </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
