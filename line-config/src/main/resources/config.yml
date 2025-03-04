@@ -4,11 +4,11 @@ spring:
   cloud:
     nacos:
       discovery:
-        ip: 2.0.20.29
-        server-addr: 192.168.40.95:8848
+        #        ip: 2.0.20.29
+        server-addr: 192.168.42.234:8848
         namespace: 20250215
       config:
-        server-addr: 192.168.40.95:8848
+        server-addr: 192.168.42.234:8848
         namespace: 20250215
         file-extension: properties
         name: ${spring.application.name}
@@ -71,3 +71,8 @@ minio:
   accessKey: mZSyfS3pFLw2rt04alFq
   secretKey: nh0r7DX4VBzs9tQdQx3WWdxqSnkJ0E4ZQUlpkHQT
   bucketName: search-line
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
