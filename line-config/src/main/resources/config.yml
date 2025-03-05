@@ -1,11 +1,17 @@
+search-line:
+  base:
+    mac: 172.16.126.156
+    zzy: 192.168.42.106
+    dell: 192.168.42.234
+    diy: 192.168.40.95
 spring:
   config:
     import: nacos:${spring.application.name},nacos:config.yml
   cloud:
     nacos:
       discovery:
-        #        ip: 2.0.20.29
-        server-addr: 192.168.42.234:8848
+        #        ip: 2.0.20.10
+        server-addr: ${search-line.base.dell}:8848
         namespace: 20250215
       config:
         server-addr: 192.168.42.234:8848
@@ -34,7 +40,7 @@ spring:
           retryInterval: 1500
           subscriptionsPerConnection: 5
           clientName: null
-          address: "redis://192.168.18.124:6379"
+          address: "redis://${search-line.base.mac}:6379"
           subscriptionConnectionMinimumIdleSize: 1
           subscriptionConnectionPoolSize: 50
           connectionMinimumIdleSize: 24
@@ -62,12 +68,12 @@ jetcache:
       valueDecoder: java
       defaultExpireInMillis: 5000
 rocketmq:
-  name-server: 192.168.40.95:9876
+  name-server: ${search-line.base.diy}:9876
   producer:
     group: file-service-producer-group
     send-message-timeout: 3000
 minio:
-  endpoint: http://192.168.18.124:9000
+  endpoint: http://${search-line.base.mac}:9000
   accessKey: mZSyfS3pFLw2rt04alFq
   secretKey: nh0r7DX4VBzs9tQdQx3WWdxqSnkJ0E4ZQUlpkHQT
   bucketName: search-line
