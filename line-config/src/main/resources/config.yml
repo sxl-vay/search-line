@@ -10,7 +10,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        #        ip: 2.0.20.10
+        ip: 2.0.20.154
         server-addr: ${search-line.base.dell}:8848
         namespace: 20250215
       config:
