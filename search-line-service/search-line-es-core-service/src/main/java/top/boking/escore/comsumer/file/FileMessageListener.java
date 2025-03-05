@@ -5,27 +5,19 @@ import io.minio.GetObjectResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.pdf.PDFParser;
-import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.data.elasticsearch.core.RefreshPolicy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.SAXException;
 import top.boking.escore.consts.ESMQConst;
 import top.boking.escore.domain.entity.FileTransferRecord;
 import top.boking.escore.domain.entity.KnowledgeBase;
 import top.boking.escore.infrastructure.mapper.FileTransferRecordMapper;
+import top.boking.escore.parser.DocumentParserFacade;
 import top.boking.escore.repository.KnowledgeBaseRepository;
 import top.boking.file.consts.MQConst;
 import top.boking.file.domain.entity.SLineFile;
 import top.boking.file.utils.MinioUtils;
 import top.boking.lock.DistributeLock;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 @Component
 @RocketMQMessageListener(
@@ -42,10 +34,14 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
 
     private final KnowledgeBaseRepository knowledgeBaseRepository;
 
-    public FileMessageListener(FileTransferRecordMapper fileTransferRecordMapper, MinioUtils minioUtils, KnowledgeBaseRepository knowledgeBaseRepository) {
+    private final DocumentParserFacade documentParserFacade;
+
+    public FileMessageListener(FileTransferRecordMapper fileTransferRecordMapper, MinioUtils minioUtils,
+                               KnowledgeBaseRepository knowledgeBaseRepository, DocumentParserFacade documentParserFacade) {
         this.fileTransferRecordMapper = fileTransferRecordMapper;
         this.minioUtils = minioUtils;
         this.knowledgeBaseRepository = knowledgeBaseRepository;
+        this.documentParserFacade = documentParserFacade;
     }
 
 
@@ -74,8 +70,8 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
 
         try {
             GetObjectResponse file = minioUtils.getFile(event.getStoreFileName());
-            //将GetObjectResponse 转换为InputStream
-            String content = parsePdf(file);
+            //使用门面模式解析不同类型的文档
+            String content = documentParserFacade.parseDocument(file, event.getSuffix());
             KnowledgeBase knowledgeBase = KnowledgeBase.convert(event);
             knowledgeBase.setFileContent(content);
             // 执行写入
@@ -93,21 +89,7 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
         }
     }
 
-    /**
-     * 使用 Apache Tika 解析 PDF 文件内容
-     * @param input PDF 文件路径
-     * @return 提取的文本内容
-     */
-    public static String parsePdf(InputStream input) throws TikaException, IOException, SAXException {
-        // 1. 创建 Tika 解析器
-        BodyContentHandler handler = new BodyContentHandler(500000);
-        Metadata metadata = new Metadata();
-        PDFParser pdfParser = new PDFParser();
-        // 2. 解析 PDF
-        pdfParser.parse(input, handler, metadata, new ParseContext());
-        // 3. 返回解析后的文本
-        return handler.toString();
-    }
+
 }
 
 

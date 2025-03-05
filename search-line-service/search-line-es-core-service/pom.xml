@@ -99,6 +99,13 @@
             <artifactId>search-line-file-core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
+        <!-- CommonMark Java解析器 -->
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark</artifactId>
+            <version>0.21.0</version>
+        </dependency>
         <dependency>
             <groupId>top.boking</groupId>
             <artifactId>search-line-lock</artifactId>
