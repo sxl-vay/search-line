@@ -11,8 +11,11 @@ import top.boking.file.domain.entity.SLineFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -38,7 +41,7 @@ public class MinioFileStore implements IFileStore{
                             .stream(file.getInputStream(),file.getSize(),-1) // 文件大小和分片大小
     //                        .contentType(file.getContentType())
                             .build());
-            String url = generatePresignedUrl(bucket, sLineFile.getStoreFileName(), 1, TimeUnit.HOURS);
+            String url = generatePresignedUrl(sLineFile.getName(),bucket, sLineFile.getStoreFileName(), 1, TimeUnit.HOURS);
             sLineFile.setStorePath(url);
 
         } catch (Exception e) {
@@ -72,15 +75,21 @@ public class MinioFileStore implements IFileStore{
      * @param unit       时间单位
      * @return 预签名链接
      */
-    public String generatePresignedUrl(String bucketName, String objectName, int expiry, TimeUnit unit) {
+    public String generatePresignedUrl(String fileName, String bucketName, String objectName, int expiry, TimeUnit unit) {
         try {
-            return minioClient.getPresignedObjectUrl(
+            String url = minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(Method.GET)
                             .bucket(bucketName)
                             .object(objectName)
+                            .extraQueryParams(Map.of(
+                                    "response-content-disposition",
+                                    "attachment; filename=\"" + URLEncoder.encode(fileName, StandardCharsets.UTF_8) + "\""
+                            ))
 //                            .expiry(expiry, unit)
                             .build());
+            log.info("download url:{}",url);
+            return url;
         } catch (MinioException | IOException | InvalidKeyException | NoSuchAlgorithmException e) {
             throw new RuntimeException("生成预签名链接失败", e);
         }

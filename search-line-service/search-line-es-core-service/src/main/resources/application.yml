@@ -4,9 +4,9 @@ spring:
   # Elasticsearch??
   elasticsearch:
     uris:
-      - http://192.168.40.95:9200
-      - http://192.168.40.95:9201
-      - http://192.168.40.95:9202
+      - http://${search-line.base.zzy}:9200
+      - http://${search-line.base.dell}:9200
+      - http://${search-line.base.diy}:9200
   application:
     name: search-line-es-core-service
   config:
