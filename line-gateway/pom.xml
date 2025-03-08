@@ -7,14 +7,9 @@
         <artifactId>Search-Line</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>top.boking</groupId>
     <artifactId>line-gateway</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <name>line-gateway</name>
     <description>line-gateway</description>
-    <properties>
-        <java.version>23</java.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -60,16 +55,16 @@
         </dependency>
 
     </dependencies>
-    <!-- pom.xml 示例 -->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>top.boking.gateway.LineGatewayAppliaction</mainClass>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <!-- &lt;!&ndash; pom.xml 示例 &ndash;&gt;
+     <build>
+         <plugins>
+             <plugin>
+                 <groupId>org.springframework.boot</groupId>
+                 <artifactId>spring-boot-maven-plugin</artifactId>
+                 <configuration>
+                     <mainClass>top.boking.gateway.LineGatewayAppliaction</mainClass>
+                 </configuration>
+             </plugin>
+         </plugins>
+     </build>-->
 </project>

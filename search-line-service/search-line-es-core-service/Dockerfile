@@ -2,7 +2,7 @@ FROM eclipse-temurin:23-jdk-alpine
 
 LABEL authors="sxl"
 
-COPY target/search-line-es-core-service-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY target/search-line-es-core-service-1.0-SNAPSHOT.jar /app/app.jar
 
 ENV JAVA_OPTS="-Xms512m -Xmx1024m"
 
