@@ -55,7 +55,7 @@
         </dependency>
 
     </dependencies>
-    <!-- &lt;!&ndash; pom.xml 示例 &ndash;&gt;
+    <!-- pom.xml 示例 -->
      <build>
          <plugins>
              <plugin>
@@ -66,5 +66,5 @@
                  </configuration>
              </plugin>
          </plugins>
-     </build>-->
+     </build>
 </project>
