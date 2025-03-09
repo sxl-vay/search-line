@@ -36,7 +36,7 @@ public class SLineFileService extends SLineFileCoreService {
             // 构建事务消息
             Message<SLineFile> message = MessageBuilder.withPayload(sLineFile)
                     .build();
-            TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(MQConst.FILE_SYN_2_ES_TOPIC, message, sLineFile);
+            TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(MQConst.FILE_SYN_2_ES_TOPIC, message, file);
             if (!transactionSendResult.getLocalTransactionState().equals(LocalTransactionState.COMMIT_MESSAGE)) {
                 throw new RuntimeException("事务消息发送失败，回滚文件记录");
             }

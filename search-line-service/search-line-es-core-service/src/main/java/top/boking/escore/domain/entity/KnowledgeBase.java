@@ -2,10 +2,9 @@ package top.boking.escore.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 import top.boking.escore.consts.IndexConsts;
 import top.boking.file.domain.entity.SLineFile;
 
@@ -13,6 +12,7 @@ import java.util.Date;
 
 @Data
 @Document(indexName = IndexConsts.FILE_KNOWLEDGE_INDEX)
+@NoArgsConstructor
 public class KnowledgeBase {
     @Id
     private String id;
@@ -54,6 +54,10 @@ public class KnowledgeBase {
 
         @Field(type = FieldType.Integer)
         private Integer pages;
+    }
+
+    public KnowledgeBase(String id) {
+        this.id = id;
     }
 
     public static KnowledgeBase convert(SLineFile file) {

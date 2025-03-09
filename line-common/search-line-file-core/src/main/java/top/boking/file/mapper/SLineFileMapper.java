@@ -9,4 +9,6 @@ import java.util.List;
 @Mapper
 public interface SLineFileMapper extends BaseMapper<SLineFile> {
     List<SLineFile> selectWithDeleteType(Integer deleteType);
+
+    Integer batchDelete2(List<Long> ids);
 }

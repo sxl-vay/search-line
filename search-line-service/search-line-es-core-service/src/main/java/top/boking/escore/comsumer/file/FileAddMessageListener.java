@@ -26,7 +26,7 @@ import top.boking.lock.DistributeLock;
         , maxReconsumeTimes = 1
 )
 @Slf4j
-public class FileMessageListener implements RocketMQListener<SLineFile> {
+public class FileAddMessageListener implements RocketMQListener<SLineFile> {
 
     private final FileTransferRecordMapper fileTransferRecordMapper;
 
@@ -36,8 +36,8 @@ public class FileMessageListener implements RocketMQListener<SLineFile> {
 
     private final DocumentParserFacade documentParserFacade;
 
-    public FileMessageListener(FileTransferRecordMapper fileTransferRecordMapper, MinioUtils minioUtils,
-                               KnowledgeBaseRepository knowledgeBaseRepository, DocumentParserFacade documentParserFacade) {
+    public FileAddMessageListener(FileTransferRecordMapper fileTransferRecordMapper, MinioUtils minioUtils,
+                                  KnowledgeBaseRepository knowledgeBaseRepository, DocumentParserFacade documentParserFacade) {
         this.fileTransferRecordMapper = fileTransferRecordMapper;
         this.minioUtils = minioUtils;
         this.knowledgeBaseRepository = knowledgeBaseRepository;

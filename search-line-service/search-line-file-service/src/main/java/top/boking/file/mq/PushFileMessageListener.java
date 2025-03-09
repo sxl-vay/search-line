@@ -8,7 +8,6 @@ import org.springframework.messaging.Message;
 import org.springframework.web.multipart.MultipartFile;
 import top.boking.file.consts.MQConst;
 import top.boking.file.domain.entity.SLineFile;
-import top.boking.file.mq.msgholder.TransactionHolder;
 import top.boking.file.service.SLineFileService;
 import top.boking.file.store.IFileStore;
 import top.boking.mq.annotation.SLineTransactionListener;
@@ -35,11 +34,11 @@ public class PushFileMessageListener implements RocketMQLocalTransactionListener
     @Override
     public RocketMQLocalTransactionState executeLocalTransaction(Message msg, Object arg) {
         long startTime = System.currentTimeMillis();
-        SLineFile sLineFile = (SLineFile) arg;
+        SLineFile sLineFile = JSON.parseObject(new String((byte[]) msg.getPayload()), SLineFile.class);
         processingFiles.add(sLineFile.getId());
         try {
-            //获取输入流
-            MultipartFile file = TransactionHolder.getMultipartFileHolder();
+
+            MultipartFile file = (MultipartFile) arg;
             if (file == null) {
                 log.error("事务消息为空，事务回滚");
                 return RocketMQLocalTransactionState.ROLLBACK;
