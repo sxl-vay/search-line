@@ -4,15 +4,28 @@
 # 获取项目根目录路径
 PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # 定义服务名称
-SERVICE_NAME="search-line-file-service"
+#SERVICE_NAME="search-line-file-service"
+#RELATIVE_PATH="search-line-service/${SERVICE_NAME}"
+## 定义远程服务器信息
+#REMOTE_IP="192.168.42.106"
+#REMOTE_USER="root"
+#REMOTE_PASSWORD="root"
 
-# 定义远程服务器信息
-REMOTE_IP="192.168.42.106"
-REMOTE_USER="root"
-REMOTE_PASSWORD="root"
+
+# 执行两次本地脚本install_all_modules.sh
+echo "正在第一次执行install_all_modules.sh..."
+sh "${PROJECT_ROOT}/shell/install_all_modules.sh"
+echo "第一次执行install_all_modules.sh完成"
+
+echo "正在第二次执行install_all_modules.sh..."
+sh "${PROJECT_ROOT}/shell/install_all_modules.sh"
+echo "第二次执行install_all_modules.sh完成"
+
+source "$(dirname "$0")/push.properties"
+
 
 # 定义本地 JAR 文件路径
-LOCAL_JAR_PATH="${PROJECT_ROOT}/search-line-service/${SERVICE_NAME}/target/${SERVICE_NAME}-1.0-SNAPSHOT.jar"
+LOCAL_JAR_PATH="${PROJECT_ROOT}/${RELATIVE_PATH}/target/${SERVICE_NAME}-1.0-SNAPSHOT.jar"
 
 # 定义本地 kill_process.sh 脚本路径
 LOCAL_KILL_SCRIPT="${PROJECT_ROOT}/shell/kill_process.sh"
@@ -72,6 +85,28 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 echo "kill_process.sh 脚本上传完成。"
+
+# 确保远程服务器上的目标目录存在
+echo "正在确保远程目录存在..."
+/usr/bin/expect <<EOF
+set timeout 20
+spawn ssh $REMOTE_USER@$REMOTE_IP
+expect {
+    "yes/no" { send "yes\r"; exp_continue }
+    "password:" { send "$REMOTE_PASSWORD\r" }
+}
+expect "root@"
+send "mkdir -p /usr/local/jar/\r"
+expect "root@"
+send "exit\r"
+expect eof
+EOF
+
+if [ $? -ne 0 ]; then
+    echo "警告：创建远程目录失败！"
+    exit 1
+fi
+echo "远程目录确认完成。"
 
 # 传输新的 JAR 文件到远程服务器
 echo "正在传输新的 JAR 文件到远程服务器..."
