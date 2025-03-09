@@ -1,25 +1,14 @@
 package top.boking.file.store;
 
-import io.minio.*;
-import io.minio.errors.MinioException;
-import io.minio.http.Method;
-import io.minio.messages.DeleteError;
-import io.minio.messages.DeleteObject;
+import io.minio.ObjectWriteResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import top.boking.file.domain.entity.SLineFile;
+import top.boking.file.utils.MinioUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -27,26 +16,19 @@ public class MinioFileStore implements IFileStore {
     @Value("${minio.bucketName}")
     private String bucket;
 
-    private final MinioClient minioClient;
+    private final MinioUtils minioUtils;
 
-    public MinioFileStore(MinioClient minioClient) {
-        this.minioClient = minioClient;
+    public MinioFileStore(MinioUtils minioUtils) {
+        this.minioUtils = minioUtils;
     }
 
     @Override
     public boolean upload(SLineFile sLineFile, MultipartFile file) {
         // 上传文件
         try {
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(sLineFile.getStoreFileName())
-                            .stream(file.getInputStream(), file.getSize(), -1) // 文件大小和分片大小
-                            //                        .contentType(file.getContentType())
-                            .build());
-            String url = generatePresignedUrl(sLineFile.getName(), bucket, sLineFile.getStoreFileName(), 1, TimeUnit.HOURS);
+            ObjectWriteResponse response = minioUtils.uploadFile(sLineFile.getStoreFileName(), file.getInputStream(), file.getSize(), sLineFile.getGmtCreate());
+            String url = minioUtils.generatePresignedUrl(sLineFile.getName(), sLineFile.getGmtCreate(), sLineFile.getStoreFileName(), -1, null);
             sLineFile.setStorePath(url);
-
         } catch (Exception e) {
             log.error("minio上传文件失败", e);
             return false;
@@ -69,55 +51,5 @@ public class MinioFileStore implements IFileStore {
         return null;
     }
 
-    /**
-     * 生成预签名链接
-     *
-     * @param bucketName 存储桶名称
-     * @param objectName 对象名称
-     * @param expiry     有效期
-     * @param unit       时间单位
-     * @return 预签名链接
-     */
-    public String generatePresignedUrl(String fileName, String bucketName, String objectName, int expiry, TimeUnit unit) {
-        try {
-            String url = minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder()
-                            .method(Method.GET)
-                            .bucket(bucketName)
-                            .object(objectName)
-                            .extraQueryParams(Map.of(
-                                    "response-content-disposition",
-                                    "attachment; filename=\"" + URLEncoder.encode(fileName, StandardCharsets.UTF_8) + "\""
-                            ))
-//                            .expiry(expiry, unit)
-                            .build());
-            log.info("download url:{}", url);
-            return url;
-        } catch (MinioException | IOException | InvalidKeyException | NoSuchAlgorithmException e) {
-            throw new RuntimeException("生成预签名链接失败", e);
-        }
-    }
 
-    //根据文件名称删除minio上的文件
-    public void deleteFile(String fileName) {
-        try {
-            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucket).object(fileName).build());
-        } catch (Exception e) {
-            log.error("删除文件失败", e);
-        }
-    }
-
-    //根据文件名称列表批量删除minio上的文件
-    public void deleteFiles(List<String> fileNames) {
-        List<DeleteObject> deleteObjectList = fileNames.stream().map(DeleteObject::new).toList();
-        Iterable<Result<DeleteError>> results = minioClient.removeObjects(RemoveObjectsArgs.builder().bucket(bucket).objects(deleteObjectList).build());
-        results.forEach(result -> {
-            try {
-                DeleteError error = result.get();
-                log.error("删除文件失败", error.message());
-            } catch (Exception e) {
-                log.error("删除文件失败", e);
-            }
-        });
-    }
 }

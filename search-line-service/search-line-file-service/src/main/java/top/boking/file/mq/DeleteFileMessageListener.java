@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import top.boking.file.consts.MQConst;
 import top.boking.file.domain.entity.SLineFile;
-import top.boking.file.store.MinioFileStore;
+import top.boking.file.utils.MinioUtils;
 import top.boking.mq.annotation.SLineTransactionListener;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 public class DeleteFileMessageListener implements RocketMQLocalTransactionListener {
 
     @Autowired
-    private MinioFileStore minioFileStore;
+    private MinioUtils minioUtils;
 
     @Override
     public RocketMQLocalTransactionState executeLocalTransaction(Message msg, Object arg) {
@@ -23,7 +23,7 @@ public class DeleteFileMessageListener implements RocketMQLocalTransactionListen
         List<SLineFile> sLineFiles = (List<SLineFile>) arg;
         List<String> fileNames = sLineFiles.stream().map(SLineFile::getStoreFileName).toList();
         //删除文件
-        minioFileStore.deleteFiles(fileNames);
+        minioUtils.deleteFiles(fileNames);
         return RocketMQLocalTransactionState.COMMIT;
     }
 

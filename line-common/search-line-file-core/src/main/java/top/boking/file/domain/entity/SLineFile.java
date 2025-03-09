@@ -4,6 +4,9 @@ import lombok.Data;
 import top.boking.base.domain.entity.BaseEntity;
 import top.boking.file.store.StoreType;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Data
 public class SLineFile extends BaseEntity {
     //文件名
@@ -18,7 +21,14 @@ public class SLineFile extends BaseEntity {
     //文件所有者
     private Long owner;
 
+    public SLineFile() {
+        setGmtCreate(new Date());
+    }
+
     public String getStoreFileName() {
-        return this.getId() + "." + suffix;
+        String fileName = this.getId() + "." + suffix;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        fileName = simpleDateFormat.format(getGmtCreate()) + "/" + fileName;
+        return fileName;
     }
 }

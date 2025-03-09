@@ -42,7 +42,7 @@ public class BaseEntity implements Serializable {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    private Date gmtCreate;
+    private Date gmtCreate = new Date();
 
     /**
      * 修改时间
