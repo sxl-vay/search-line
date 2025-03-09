@@ -22,7 +22,7 @@ import top.boking.lock.DistributeLock;
 @Component
 @RocketMQMessageListener(
         consumerGroup = ESMQConst.FILE_SYNC_COMSUMERGROUP
-        , topic = (MQConst.FILE_TRANSACTION_TOPIC)
+        , topic = (MQConst.FILE_SYN_2_ES_TOPIC)
         , maxReconsumeTimes = 1
 )
 @Slf4j

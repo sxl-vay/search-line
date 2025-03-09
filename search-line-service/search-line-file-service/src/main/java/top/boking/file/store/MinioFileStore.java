@@ -3,6 +3,8 @@ package top.boking.file.store;
 import io.minio.*;
 import io.minio.errors.MinioException;
 import io.minio.http.Method;
+import io.minio.messages.DeleteError;
+import io.minio.messages.DeleteObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,12 +17,13 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
-public class MinioFileStore implements IFileStore{
+public class MinioFileStore implements IFileStore {
     @Value("${minio.bucketName}")
     private String bucket;
 
@@ -38,10 +41,10 @@ public class MinioFileStore implements IFileStore{
                     PutObjectArgs.builder()
                             .bucket(bucket)
                             .object(sLineFile.getStoreFileName())
-                            .stream(file.getInputStream(),file.getSize(),-1) // 文件大小和分片大小
-    //                        .contentType(file.getContentType())
+                            .stream(file.getInputStream(), file.getSize(), -1) // 文件大小和分片大小
+                            //                        .contentType(file.getContentType())
                             .build());
-            String url = generatePresignedUrl(sLineFile.getName(),bucket, sLineFile.getStoreFileName(), 1, TimeUnit.HOURS);
+            String url = generatePresignedUrl(sLineFile.getName(), bucket, sLineFile.getStoreFileName(), 1, TimeUnit.HOURS);
             sLineFile.setStorePath(url);
 
         } catch (Exception e) {
@@ -88,10 +91,33 @@ public class MinioFileStore implements IFileStore{
                             ))
 //                            .expiry(expiry, unit)
                             .build());
-            log.info("download url:{}",url);
+            log.info("download url:{}", url);
             return url;
         } catch (MinioException | IOException | InvalidKeyException | NoSuchAlgorithmException e) {
             throw new RuntimeException("生成预签名链接失败", e);
         }
+    }
+
+    //根据文件名称删除minio上的文件
+    public void deleteFile(String fileName) {
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucket).object(fileName).build());
+        } catch (Exception e) {
+            log.error("删除文件失败", e);
+        }
+    }
+
+    //根据文件名称列表批量删除minio上的文件
+    public void deleteFiles(List<String> fileNames) {
+        List<DeleteObject> deleteObjectList = fileNames.stream().map(DeleteObject::new).toList();
+        Iterable<Result<DeleteError>> results = minioClient.removeObjects(RemoveObjectsArgs.builder().bucket(bucket).objects(deleteObjectList).build());
+        results.forEach(result -> {
+            try {
+                DeleteError error = result.get();
+                log.error("删除文件失败", error.message());
+            } catch (Exception e) {
+                log.error("删除文件失败", e);
+            }
+        });
     }
 }

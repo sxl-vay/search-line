@@ -1,5 +1,6 @@
 package top.boking.escore.scheduler;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -12,11 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import top.boking.escore.consts.ESMQConst;
 import top.boking.escore.entity.DeadLetterRecord;
 import top.boking.escore.repository.DeadLetterRecordRepository;
 import top.boking.file.consts.MQConst;
-import com.alibaba.fastjson.JSON;
 import top.boking.file.domain.entity.SLineFile;
 
 import java.util.List;
@@ -70,7 +69,7 @@ public class DeadLetterRetryScheduler {
     private void retryMes(MessageExt msg) {
         Map<String, String> properties = msg.getProperties();
         String retryTopic = properties.get("RETRY_TOPIC");
-        if (!MQConst.FILE_TRANSACTION_TOPIC.equals(retryTopic)) {
+        if (!MQConst.FILE_SYN_2_ES_TOPIC.equals(retryTopic)) {
             return;
         }
         // 重新投递消息到原始队列

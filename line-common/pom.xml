@@ -14,6 +14,7 @@
         <module>search-line-user-core</module>
         <module>search-line-dubbo</module>
         <module>search-line-lock</module>
+        <module>search-line-mq</module>
     </modules>
 
     <properties>

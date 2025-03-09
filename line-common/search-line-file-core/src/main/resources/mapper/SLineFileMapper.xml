@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.boking.file.mapper.SLineFileMapper">
+    <resultMap id="BaseResultMap" type="top.boking.file.domain.entity.SLineFile">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="store_type" jdbcType="VARCHAR" property="storeType"/>
+        <result column="store_path" jdbcType="VARCHAR" property="storePath"/>
+        <result column="suffix" jdbcType="VARCHAR" property="suffix"/>
+        <result column="file_size" jdbcType="BIGINT" property="fileSize"/>
+        <result column="owner" jdbcType="BIGINT" property="owner"/>
+        <result column="deleted" jdbcType="INTEGER" property="deleted"/>
+        <result column="lock_version" jdbcType="INTEGER" property="lockVersion"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+    </resultMap>
+
+    <select id="selectWithDeleteType" resultMap="BaseResultMap">
+        select id,
+               name,
+               store_type,
+               store_path,
+               suffix,
+               file_size,
+               owner,
+               deleted,
+               lock_version,
+               gmt_create,
+               gmt_modified
+        from s_line_file
+        where deleted = #{deleteType}
+    </select>
+</mapper>

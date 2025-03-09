@@ -27,6 +27,7 @@ public class SLineFileService extends SLineFileCoreService {
         SLineFile sLineFile = buildSlineFile(file);
         //获取当前工程的resources目录
         if (!file.isEmpty()) {
+
             log.info("文件上传中，sLineFile:{}", sLineFile);
         }
         TransactionHolder.setMultipartFile(file);
@@ -35,7 +36,7 @@ public class SLineFileService extends SLineFileCoreService {
             // 构建事务消息
             Message<SLineFile> message = MessageBuilder.withPayload(sLineFile)
                     .build();
-            TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(MQConst.FILE_TRANSACTION_TOPIC, message, sLineFile);
+            TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(MQConst.FILE_SYN_2_ES_TOPIC, message, sLineFile);
             if (!transactionSendResult.getLocalTransactionState().equals(LocalTransactionState.COMMIT_MESSAGE)) {
                 throw new RuntimeException("事务消息发送失败，回滚文件记录");
             }

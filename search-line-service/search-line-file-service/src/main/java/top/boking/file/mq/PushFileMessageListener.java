@@ -2,23 +2,22 @@ package top.boking.file.mq;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.spring.annotation.RocketMQTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
 import org.springframework.messaging.Message;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import top.boking.file.consts.MQConst;
 import top.boking.file.domain.entity.SLineFile;
 import top.boking.file.mq.msgholder.TransactionHolder;
 import top.boking.file.service.SLineFileService;
 import top.boking.file.store.IFileStore;
+import top.boking.mq.annotation.SLineTransactionListener;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
-@Component
-@RocketMQTransactionListener
+@SLineTransactionListener(topic = MQConst.FILE_SYN_2_ES_TOPIC/*, tag = MQConst.FILE_TRANSACTION_TAG*/)
 public class PushFileMessageListener implements RocketMQLocalTransactionListener {
 
     private final long timeout = 3000_000;
