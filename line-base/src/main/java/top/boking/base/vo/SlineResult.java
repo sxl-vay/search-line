@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import top.boking.base.response.SingleResponse;
 
+import java.io.Serializable;
+
 import static top.boking.base.response.ResponseCode.SUCCESS;
 
 /**
@@ -11,7 +13,7 @@ import static top.boking.base.response.ResponseCode.SUCCESS;
  */
 @Getter
 @Setter
-public class SlineResult<T> {
+public class SlineResult<T> implements Serializable {
     /**
      * 状态码
      */

@@ -1,8 +1,10 @@
 package top.boking.file.controller;
 
+import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/file")
+@Slf4j
 public class FileStoreController {
     @Autowired
     private SLineFileService sLineFileService;
@@ -46,8 +49,9 @@ public class FileStoreController {
 
 
     @GetMapping("/list")
+    @Cached(name = "file:list", expire = 3600, key = "{#current,#pageSize}")
     public SlineResult<SlineFilePageRespose> list(@RequestParam("current") Long current, @RequestParam("pageSize") Long pageSize) {
-
+        log.info("list:current:{},pageSize:{}", current, pageSize);
         QueryWrapper<SLineFile> queryWrapper = new QueryWrapper<>();
         LambdaQueryWrapper<SLineFile> lambda = queryWrapper.lambda();
         lambda.orderBy(true, false, SLineFile::getGmtCreate);

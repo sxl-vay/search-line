@@ -13,16 +13,24 @@ PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
 
 
 # 执行两次本地脚本install_all_modules.sh
-echo "正在第一次执行install_all_modules.sh..."
-sh "${PROJECT_ROOT}/shell/install_all_modules.sh"
-echo "第一次执行install_all_modules.sh完成"
 
-echo "正在第二次执行install_all_modules.sh..."
-sh "${PROJECT_ROOT}/shell/install_all_modules.sh"
-echo "第二次执行install_all_modules.sh完成"
 
 source "$(dirname "$0")/push.properties"
+# 判断变量 SKIP_MVN_INSTALL=true
+if [ $MVN_INSTALL_TIME = 1 ]; then
+    echo "正在第一次执行install_all_modules.sh..."
+    sh "${PROJECT_ROOT}/shell/install_all_modules.sh"
+    echo "第一次执行install_all_modules.sh完成"
+fi
 
+if [ $MVN_INSTALL_TIME = 2 ]; then
+    echo "正在第一次执行install_all_modules.sh..."
+    sh "${PROJECT_ROOT}/shell/install_all_modules.sh"
+    echo "第一次执行install_all_modules.sh完成"
+    echo "正在第二次执行install_all_modules.sh..."
+    sh "${PROJECT_ROOT}/shell/install_all_modules.sh"
+    echo "第二次执行install_all_modules.sh完成"
+fi
 
 # 定义本地 JAR 文件路径
 LOCAL_JAR_PATH="${PROJECT_ROOT}/${RELATIVE_PATH}/target/${SERVICE_NAME}-1.0-SNAPSHOT.jar"
@@ -111,7 +119,7 @@ echo "远程目录确认完成。"
 # 传输新的 JAR 文件到远程服务器
 echo "正在传输新的 JAR 文件到远程服务器..."
 /usr/bin/expect <<EOF
-set timeout 100
+set timeout 1000
 spawn scp $LOCAL_JAR_PATH $REMOTE_USER@$REMOTE_IP:$REMOTE_JAR_PATH
 expect {
     "yes/no" { send "yes\r"; exp_continue }

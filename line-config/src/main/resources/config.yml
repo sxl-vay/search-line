@@ -10,7 +10,7 @@ spring:
   cloud:
     nacos:
       discovery:
-#        ip: 2.0.20.154
+        #ip: 2.0.20.124
         server-addr: ${search-line.base.dell}:8848
         namespace: 20250215
       config:
@@ -29,6 +29,14 @@ spring:
     url: jdbc:mysql://47.101.167.248:3306/search_line?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: root
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 10
+      idle-timeout: 30000
+      max-lifetime: 60000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+    #      pool-name: search-line-file-service-pool
   redis:
     redisson:
       config: |

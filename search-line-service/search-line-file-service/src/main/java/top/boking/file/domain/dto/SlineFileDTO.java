@@ -3,10 +3,11 @@ package top.boking.file.domain.dto;
 import lombok.Data;
 import top.boking.file.domain.entity.SLineFile;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
 @Data
-public class SlineFileDTO {
+public class SlineFileDTO implements Serializable {
     private String id;
     private String name;
     private String fileSize;

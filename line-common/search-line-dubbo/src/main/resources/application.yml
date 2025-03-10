@@ -3,10 +3,11 @@ dubbo:
     name: ${spring.application.name}
     logger: slf4j
   protocol:
+    serialization: fastjson2
     port: 50052
     name: tri
   registry:
-    address: nacos://192.168.40.95:8848?username=nacos&password=nacos
+    address: nacos://${search-line.base.dell}:8848?username=nacos&password=nacos
     parameters:
       namespace: 20250222
       group: dubbo #首次启动前务必修改成你自己的
