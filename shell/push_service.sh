@@ -10,8 +10,6 @@ PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
 #REMOTE_IP="192.168.42.106"
 #REMOTE_USER="root"
 #REMOTE_PASSWORD="root"
-
-
 # 执行两次本地脚本install_all_modules.sh
 
 
@@ -36,7 +34,7 @@ fi
 LOCAL_JAR_PATH="${PROJECT_ROOT}/${RELATIVE_PATH}/target/${SERVICE_NAME}-1.0-SNAPSHOT.jar"
 
 # 定义本地 kill_process.sh 脚本路径
-LOCAL_KILL_SCRIPT="${PROJECT_ROOT}/shell/kill_process.sh"
+LOCAL_KILL_SCRIPT="${PROJECT_ROOT}/shell/remote_template/kill_process.sh"
 
 # 定义远程 JAR 文件路径
 REMOTE_JAR_PATH="/usr/local/jar/${SERVICE_NAME}-1.0-SNAPSHOT.jar"
