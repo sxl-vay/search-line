@@ -1,10 +1,16 @@
 package top.boking.file.service;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.template.QuickConfig;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.LocalTransactionState;
 import org.apache.rocketmq.client.producer.TransactionSendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
@@ -13,30 +19,46 @@ import top.boking.file.consts.MQConst;
 import top.boking.file.domain.entity.SLineFile;
 import top.boking.file.mq.msgholder.TransactionHolder;
 
+import java.time.Duration;
+
 @Service
 @Slf4j
 public class SLineFileService extends SLineFileCoreService {
 
     private final RocketMQTemplate rocketMQTemplate;
+    Cache<String, Object> orCreateCache;
+    @Autowired
+    private CacheManager cacheManager;
+
+    @PostConstruct
+    public void init() {
+        QuickConfig quickConfig = QuickConfig.newBuilder("file:list")
+                .cacheType(CacheType.BOTH)
+                .expire(Duration.ofHours(2))
+                .syncLocal(true)
+                .build();
+        orCreateCache = cacheManager.getOrCreateCache(quickConfig);
+    }
 
     public SLineFileService(RocketMQTemplate rocketMQTemplate) {
         this.rocketMQTemplate = rocketMQTemplate;
     }
 
-    public SLineFile uploadFile(MultipartFile file){
-        SLineFile sLineFile = buildSlineFile(file);
+    public SLineFile uploadFile(MultipartFile multipartFile) {
+        orCreateCache.remove("[1,10]");
+        SLineFile sLineFile = buildSlineFile(multipartFile);
         //获取当前工程的resources目录
-        if (!file.isEmpty()) {
+        if (!multipartFile.isEmpty()) {
 
             log.info("文件上传中，sLineFile:{}", sLineFile);
         }
-        TransactionHolder.setMultipartFile(file);
+        TransactionHolder.setMultipartFile(multipartFile);
         try {
             log.info("事务消息发送中，sLineFile:{}", sLineFile);
             // 构建事务消息
             Message<SLineFile> message = MessageBuilder.withPayload(sLineFile)
                     .build();
-            TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(MQConst.FILE_SYN_2_ES_TOPIC, message, file);
+            TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(MQConst.FILE_SYN_2_ES_TOPIC, message, multipartFile);
             if (!transactionSendResult.getLocalTransactionState().equals(LocalTransactionState.COMMIT_MESSAGE)) {
                 throw new RuntimeException("事务消息发送失败，回滚文件记录");
             }

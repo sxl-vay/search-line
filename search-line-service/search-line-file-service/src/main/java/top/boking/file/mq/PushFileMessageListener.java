@@ -23,13 +23,14 @@ public class PushFileMessageListener implements RocketMQLocalTransactionListener
 
     private final SLineFileService sLineFileService;
     private final IFileStore fileStore;
+    private final Set<Long> processingFiles = new HashSet<>();
+
 
     public PushFileMessageListener(SLineFileService sLineFileService, IFileStore fileStores) {
         this.sLineFileService = sLineFileService;
         this.fileStore = fileStores;
     }
 
-    private final Set<Long> processingFiles = new HashSet<>();
 
     @Override
     public RocketMQLocalTransactionState executeLocalTransaction(Message msg, Object arg) {

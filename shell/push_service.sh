@@ -3,18 +3,18 @@
 
 # 获取项目根目录路径
 PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
-# 定义服务名称
-#SERVICE_NAME="search-line-file-service"
-#RELATIVE_PATH="search-line-service/${SERVICE_NAME}"
-## 定义远程服务器信息
-#REMOTE_IP="192.168.42.106"
-#REMOTE_USER="root"
-#REMOTE_PASSWORD="root"
-# 执行两次本地脚本install_all_modules.sh
 
 
-source "$(dirname "$0")/push.properties"
-# 判断变量 SKIP_MVN_INSTALL=true
+
+SERVICE_NAME="line-gateway"
+RELATIVE_PATH="${SERVICE_NAME}"
+# ?????????
+REMOTE_IP="192.168.42.106"
+REMOTE_USER="root"
+REMOTE_PASSWORD="root"
+MVN_INSTALL_TIME=0
+
+# 判断变量 $MVN_INSTALL_TIME
 if [ $MVN_INSTALL_TIME = 1 ]; then
     echo "正在第一次执行install_all_modules.sh..."
     sh "${PROJECT_ROOT}/shell/install_all_modules.sh"
