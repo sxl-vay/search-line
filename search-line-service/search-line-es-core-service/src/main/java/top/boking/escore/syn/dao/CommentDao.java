@@ -22,7 +22,7 @@ public class CommentDao implements PushDao<Comment> {
     }
 
     @Override
-    public List<Comment> batchQueryComments(long offset, int limit) {
+    public List<Comment> idCursorQuery(long offset, int limit) {
         List<Comment> comments = new ArrayList<>();
         String sql = "SELECT * FROM comment where id > ? LIMIT ?";
 

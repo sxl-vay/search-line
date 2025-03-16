@@ -70,6 +70,7 @@ public class ESBatchPushTest {
                 if (i % 100 == 0 && i != 0) {
                     try {
                         //todo 批量写入部分失败场景需要解决！！ 这里先按照统一失败处理
+                        //todo 这里的批处理逻辑可能会丢失末尾的少于一百的数据
                         BulkResponse bulkResponse = elasticsearchClient.bulk(br.build());
                         if (bulkResponse.errors()) {
                             log.error("批量写入出现错误：{}", bulkResponse.items().stream()

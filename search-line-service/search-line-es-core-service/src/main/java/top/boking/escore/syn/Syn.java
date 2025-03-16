@@ -19,15 +19,16 @@ public class Syn<T extends PushBashEntity> {
     private final SyntoQueueHolder<T> syntoQueueHolder = new SyntoQueueHolder<>();
 
     private final AtomicBoolean isFinish = new AtomicBoolean(false);
-    private final Consumer<T> consumer;
-    private final PushDao<T> pushDao;
+
     private AtomicLong count = new AtomicLong(0);
 
-    public Syn(Consumer<T> consumer, PushDao<T> pushDao) {
+    private final Consumer<T> consumer;
 
+    private final PushDao<T> pushDao;
+
+    public Syn(Consumer<T> consumer, PushDao<T> pushDao) {
         this.consumer = consumer;
         this.pushDao = pushDao;
-
     }
 
     public long getConsumerCount() {
@@ -40,47 +41,55 @@ public class Syn<T extends PushBashEntity> {
 
     public void startPoll() {
         try {
-            CompletableFuture.runAsync(() -> {
-                if (isFinish.get()) {
-                    return;
-                }
-                List<T> comments = pushDao.batchQueryComments(0, 1000);
-
-                while (comments.size() > 0) {
-                    boolean put = syntoQueueHolder.put(comments, 1000);
-                    while (!put) {
-                        syntoQueueHolder.put(comments, 1000);
-                    }
-                    comments = pushDao.batchQueryComments(comments.get(comments.size() - 1).getId(), 1000);
-                }
-                isFinish.set(true);
-            });
-
-            CompletableFuture.runAsync(() -> {
-                T comment = syntoQueueHolder.poll();
-
-                while (comment != null || !isFinish.get()) {
-                    comment = syntoQueueHolder.poll(10);
-                    if (comment != null) {
-                        long c = count.incrementAndGet();
-                        try {
-                            consumer.accept(comment);
-                        } catch (Exception e) {
-                            log.error("consumer error:", e);
-                        }
-                        if (log.isTraceEnabled()) {
-                            log.trace("consumer count:{}", c);
-                        }
-                    }
-                }
-                //获取 T 的实际对象名称
-                String className = pushDao.getClass().getGenericInterfaces()[0].getTypeName();
-                log.info("stopPoll:obj:{}, count:{}", className, count.get());
-            });
+            //数据库查询到的数据放入队列中
+            doQuery();
+            //队列中取出数据进行消费
+            doConsumer();
             log.info("startPoll");
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void doQuery() {
+        CompletableFuture.runAsync(() -> {
+            if (isFinish.get()) {
+                return;
+            }
+            List<T> entitys = pushDao.idCursorQuery(0, 1000);
+            while (entitys.size() > 0) {
+                boolean put = syntoQueueHolder.put(entitys, 1000);
+                while (!put) {
+                    syntoQueueHolder.put(entitys, 1000);
+                }
+                entitys = pushDao.idCursorQuery(entitys.get(entitys.size() - 1).getId(), 1000);
+            }
+            isFinish.set(true);
+        });
+    }
+
+    private void doConsumer() {
+        CompletableFuture.runAsync(() -> {
+            T comment = syntoQueueHolder.poll();
+            while (comment != null || !isFinish.get()) {
+                comment = syntoQueueHolder.poll(10);
+                if (comment != null) {
+                    long c = count.incrementAndGet();
+                    try {
+                        consumer.accept(comment);
+                    } catch (Exception e) {
+                        //todo 消费失败需要处理下，不能直接略过
+                        log.error("consumer error:", e);
+                    }
+                    if (log.isTraceEnabled()) {
+                        log.trace("consumer count:{}", c);
+                    }
+                }
+            }
+            //获取 T 的实际对象名称
+            String className = pushDao.getClass().getGenericInterfaces()[0].getTypeName();
+            log.info("stopPoll:obj:{}, count:{}", className, count.get());
+        });
     }
 
 }
