@@ -1,5 +1,6 @@
 package top.boking.escore.syn;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.boking.escore.syn.dao.CommentDao;
@@ -8,6 +9,9 @@ import top.boking.escore.syn.entity.PushBashEntity;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -18,7 +22,9 @@ public class Syn<T extends PushBashEntity> {
 
     private final SyntoQueueHolder<T> syntoQueueHolder = new SyntoQueueHolder<>();
 
-    private final AtomicBoolean isFinish = new AtomicBoolean(false);
+    private final AtomicBoolean queryFinish = new AtomicBoolean(false);
+
+    private final AtomicBoolean consumerFinish = new AtomicBoolean(false);
 
     private AtomicLong count = new AtomicLong(0);
 
@@ -35,8 +41,13 @@ public class Syn<T extends PushBashEntity> {
         return count.get();
     }
 
-    public boolean isFinish() {
-        return isFinish.get();
+    private static @NotNull ThreadPoolExecutor getExecutor() {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(1));
+        return executor;
+    }
+
+    public boolean isQueryFinish() {
+        return queryFinish.get();
     }
 
     public void startPoll() {
@@ -51,9 +62,13 @@ public class Syn<T extends PushBashEntity> {
         }
     }
 
+    public boolean isConsumerFinish() {
+        return consumerFinish.get();
+    }
+
     private void doQuery() {
         CompletableFuture.runAsync(() -> {
-            if (isFinish.get()) {
+            if (queryFinish.get()) {
                 return;
             }
             List<T> entitys = pushDao.idCursorQuery(0, 1000);
@@ -64,14 +79,14 @@ public class Syn<T extends PushBashEntity> {
                 }
                 entitys = pushDao.idCursorQuery(entitys.get(entitys.size() - 1).getId(), 1000);
             }
-            isFinish.set(true);
+            queryFinish.set(true);
         });
     }
 
     private void doConsumer() {
         CompletableFuture.runAsync(() -> {
             T comment = syntoQueueHolder.poll();
-            while (comment != null || !isFinish.get()) {
+            while (comment != null || !queryFinish.get()) {
                 comment = syntoQueueHolder.poll(10);
                 if (comment != null) {
                     long c = count.incrementAndGet();
@@ -86,10 +101,11 @@ public class Syn<T extends PushBashEntity> {
                     }
                 }
             }
+            consumerFinish.set(true);
             //获取 T 的实际对象名称
             String className = pushDao.getClass().getGenericInterfaces()[0].getTypeName();
             log.info("stopPoll:obj:{}, count:{}", className, count.get());
-        });
+        }/*, getExecutor()*/);
     }
 
 }

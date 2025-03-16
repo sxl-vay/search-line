@@ -1,8 +1,10 @@
 package top.boking.escore.syn;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
+import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -13,9 +15,8 @@ import top.boking.escore.syn.entity.Comment;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 @Component
@@ -24,8 +25,6 @@ public class ESBatchPushTest {
 
     @Autowired
     private ElasticsearchClient elasticsearchClient;
-
-    private ArrayBlockingQueue<Comment> queue = new ArrayBlockingQueue<>(10000);
 
     private Syn<Comment> syn;
 
@@ -44,73 +43,48 @@ public class ESBatchPushTest {
 
         syn.startPoll();
 
-        pushSchedule();
-
     }
 
     private @NotNull Consumer<Comment> comsumer() {
+        AtomicInteger count = new AtomicInteger(0);
+        AtomicReference<BulkRequest.Builder> br = new AtomicReference<>(new BulkRequest.Builder());
+
         return comment -> {
-            try {
-                boolean offer = queue.offer(comment, 1000, TimeUnit.MILLISECONDS);
-                while (!offer) {
-                    offer = queue.offer(comment, 1000, TimeUnit.MILLISECONDS);
+
+            br.get().operations(op -> op
+                            .create(idx -> idx
+                                    .index("comment")
+                                    .id(String.valueOf(comment.getId()))
+                                    .document(comment)
+                            )
+                    )
+                    .refresh(Refresh.True)
+            ;
+
+            if (count.incrementAndGet() % 100 == 0) {
+                try {
+                    //todo 批量写入部分失败场景需要解决！！ 这里先按照统一失败处理
+                    //todo 这里的批处理逻辑可能会丢失末尾的少于一百的数据
+                    BulkResponse bulkResponse = elasticsearchClient.bulk(br.get().build());
+                    if (bulkResponse.errors()) {
+                        log.error("批量写入出现错误：{}", bulkResponse.items().stream()
+                                .filter(item -> item.error() != null)
+                                .map(item -> String.format("id: %s, error: %s", item.id(), item.error().reason()))
+                        );
+                        // 重试
+                        br.set(new BulkRequest.Builder());
+
+                    } else {
+                        log.info("批量写入成功，共当前写入{}条数据", JSONObject.toJSONString(bulkResponse.items()));
+                        br.set(new BulkRequest.Builder());
+                    }
+                } catch (IOException e) {
+                    log.error("批量写入出现错误", e);
+                    // 重试
                 }
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
         };
     }
 
-
-    public void pushSchedule() {
-
-        CompletableFuture.runAsync(() -> {
-            BulkRequest.Builder br = new BulkRequest.Builder();
-            for (int i = 0; !syn.isFinish() || queue.size() != 0; i++) {
-                if (i % 100 == 0 && i != 0) {
-                    try {
-                        //todo 批量写入部分失败场景需要解决！！ 这里先按照统一失败处理
-                        //todo 这里的批处理逻辑可能会丢失末尾的少于一百的数据
-                        BulkResponse bulkResponse = elasticsearchClient.bulk(br.build());
-                        if (bulkResponse.errors()) {
-                            log.error("批量写入出现错误：{}", bulkResponse.items().stream()
-                                    .filter(item -> item.error() != null)
-                                    .map(item -> String.format("id: %s, error: %s", item.id(), item.error().reason()))
-                            );
-                            // 重试
-                            i--;
-                            continue;
-                        } else {
-                            log.info("批量写入成功，共当前写入{}条数据", i);
-                            br = new BulkRequest.Builder();
-                        }
-                    } catch (IOException e) {
-                        log.error("批量写入出现错误", e);
-                        // 重试
-                        i--;
-                        continue;
-                    }
-                }
-                Comment comment = queue.poll();
-                if (comment == null) {
-                    try {
-                        Thread.sleep(500);
-                        i--;
-                        continue;
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                br.operations(op -> op
-                        .create(idx -> idx
-                                .index("comment")
-                                .id(String.valueOf(comment.getId()))
-                                .document(comment)
-                        )
-                );
-            }
-        });
-
-    }
 
 }
