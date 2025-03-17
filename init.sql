@@ -86,4 +86,69 @@ CREATE TABLE `dead_letter_record`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
+-- 评论主题表
+CREATE TABLE IF NOT EXISTS `comment_subject`
+(
+    `id`           bigint      NOT NULL COMMENT '主键',
+    `obj_id`       varchar(64) NOT NULL COMMENT '评论对象ID',
+    `user_id`      bigint      NOT NULL COMMENT '用户ID',
+    `count`        int         NOT NULL DEFAULT 0 COMMENT '评论总数',
+    `root_count`   int         NOT NULL DEFAULT 0 COMMENT '根评论数',
+    `lock_version` int         NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    `deleted`      tinyint     NOT NULL DEFAULT 0 COMMENT '是否删除',
+    `gmt_create`   datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `gmt_modified` datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_obj_id` (`obj_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='评论主题表';
+
+-- 评论索引表
+CREATE TABLE IF NOT EXISTS `comment_index`
+(
+    `id`           bigint      NOT NULL COMMENT '主键',
+    `obj_id`       varchar(64) NOT NULL COMMENT '评论对象ID',
+    `user_id`      bigint      NOT NULL COMMENT '用户ID',
+    `root_id`      bigint      NOT NULL DEFAULT 0 COMMENT '根评论ID',
+    `parent_id`    bigint      NOT NULL DEFAULT 0 COMMENT '父评论ID',
+    `like_count`   int         NOT NULL DEFAULT 0 COMMENT '点赞数',
+    `lock_version` int         NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    `deleted`      tinyint     NOT NULL DEFAULT 0 COMMENT '是否删除',
+    `gmt_create`   datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `gmt_modified` datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_obj_id` (`obj_id`),
+    KEY `idx_user_id` (`user_id`),
+    KEY `idx_root_id` (`root_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='评论索引表';
+
+-- 评论内容表
+CREATE TABLE IF NOT EXISTS `comment_content`
+(
+    `id`               bigint   NOT NULL COMMENT '主键',
+    `comment_index_id` bigint   NOT NULL COMMENT '评论索引ID',
+    `content`          text     NOT NULL COMMENT '评论内容',
+    `deleted`          tinyint  NOT NULL DEFAULT 0 COMMENT '是否删除',
+    `gmt_create`       datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `gmt_modified`     datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_comment_index_id` (`comment_index_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='评论内容表';
+
+-- 用户点赞表
+CREATE TABLE IF NOT EXISTS `user_like`
+(
+    `id`           bigint   NOT NULL COMMENT '主键',
+    `user_id`      bigint   NOT NULL COMMENT '用户ID',
+    `comment_id`   bigint   NOT NULL COMMENT '评论ID',
+    `deleted`      tinyint  NOT NULL DEFAULT 0 COMMENT '是否删除',
+    `gmt_create`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_user_comment` (`user_id`, `comment_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='用户点赞表';
+
 

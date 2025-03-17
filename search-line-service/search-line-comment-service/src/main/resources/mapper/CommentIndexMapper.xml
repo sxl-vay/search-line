@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.boking.comment.mapper.CommentIndexMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.boking.comment.entity.CommentIndex">
+        <id column="id" property="id"/>
+        <result column="obj_id" property="objId"/>
+        <result column="user_id" property="userId"/>
+        <result column="root_id" property="rootId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <result column="gmt_modified" property="gmtModified"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , obj_id, user_id, root_id, parent_id, like_count, gmt_create, gmt_modified
+    </sql>
+
+    <!-- 根据对象ID查询评论列表 -->
+    <select id="selectByObjId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM comment_index
+        WHERE obj_id = #{objId}
+        ORDER BY gmt_create DESC
+    </select>
+
+    <!-- 查询评论回复列表 -->
+    <select id="selectReplies" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM comment_index
+        WHERE root_id = #{rootId}
+        ORDER BY gmt_create ASC
+    </select>
+
+    <!-- 更新点赞数 -->
+    <update id="updateLikeCount">
+        UPDATE comment_index
+        SET like_count = #{likeCount}
+        WHERE id = #{id}
+    </update>
+</mapper>

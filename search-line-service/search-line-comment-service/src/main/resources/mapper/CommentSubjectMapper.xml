@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.boking.comment.mapper.CommentSubjectMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.boking.comment.entity.CommentSubject">
+        <id column="id" property="id"/>
+        <result column="obj_id" property="objId"/>
+        <result column="user_id" property="userId"/>
+        <result column="count" property="count"/>
+        <result column="root_count" property="rootCount"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <result column="gmt_modified" property="gmtModified"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , obj_id, user_id, count, root_count, gmt_create, gmt_modified
+    </sql>
+
+    <!-- 根据对象ID查询评论主题 -->
+    <select id="selectByObjId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM comment_subject
+        WHERE obj_id = #{objId}
+    </select>
+
+    <!-- 批量查询评论主题 -->
+    <select id="selectByObjIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM comment_subject
+        WHERE obj_id IN
+        <foreach collection="objIds" item="objId" open="(" separator="," close=")">
+            #{objId}
+        </foreach>
+    </select>
+</mapper>

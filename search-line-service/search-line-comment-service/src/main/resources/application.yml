@@ -1,5 +1,5 @@
 server:
-  port: 8315
+  port: 8415
 spring:
   application:
     name: search-line-user-service
@@ -9,6 +9,6 @@ spring:
 # MyBatis??
 mybatis:
   mapper-locations: classpath:mapper/*.xml
-#  type-aliases-package: com.search.entity
+  #  type-aliases-package: com.search.entity
   configuration:
     map-underscore-to-camel-case: true

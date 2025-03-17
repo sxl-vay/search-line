@@ -4,7 +4,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
-import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -32,9 +31,9 @@ public class ESBatchPushTest {
     public void init() throws Exception {
 
         Connection connection = SynDataSourceConfig.getSynDataSource(
-                "jdbc:mysql://10.12.102.19:3306/ebuilder_form?characterEncoding=utf8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&allowMultiQueries=true"
+                "jdbc:mysql://10.12.103.14:3306/ebuilder_form?characterEncoding=utf8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&"
                 , "database"
-                , "GGyasDd6sdTR7e"
+                , "wJDCojuAYr6BbEQr"
         ).getConnection();
 
         CommentDao commentDao = new CommentDao(connection);
@@ -53,7 +52,7 @@ public class ESBatchPushTest {
 
             br.get().operations(op -> op
                             .create(idx -> idx
-                                    .index("comment")
+                                    .index("comment2")
                                     .id(String.valueOf(comment.getId()))
                                     .document(comment)
                             )
@@ -61,7 +60,7 @@ public class ESBatchPushTest {
                     .refresh(Refresh.True)
             ;
 
-            if (count.incrementAndGet() % 100 == 0) {
+            if (count.incrementAndGet() % 1000 == 0) {
                 try {
                     //todo 批量写入部分失败场景需要解决！！ 这里先按照统一失败处理
                     //todo 这里的批处理逻辑可能会丢失末尾的少于一百的数据
@@ -75,7 +74,7 @@ public class ESBatchPushTest {
                         br.set(new BulkRequest.Builder());
 
                     } else {
-                        log.info("批量写入成功，共当前写入{}条数据", JSONObject.toJSONString(bulkResponse.items()));
+                        log.info("批量写入成功，共当前写入{}条数据", count.get());
                         br.set(new BulkRequest.Builder());
                     }
                 } catch (IOException e) {
