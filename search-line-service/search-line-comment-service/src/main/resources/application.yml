@@ -1,10 +1,15 @@
 server:
   port: 8415
+  servlet:
+    context-path: /api/comment
 spring:
   application:
-    name: search-line-user-service
+    name: search-line-comment-service
   config:
     import: classpath:config.yml
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 # MyBatis??
 mybatis:

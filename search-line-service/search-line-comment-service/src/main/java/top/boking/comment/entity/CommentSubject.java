@@ -5,7 +5,7 @@ import lombok.Data;
 import top.boking.base.domain.entity.BaseEntity;
 
 @Data
-@TableName("comment_index")
+@TableName("comment_subject")
 public class CommentSubject extends BaseEntity {
     /**
      * 主键ID
@@ -31,9 +31,4 @@ public class CommentSubject extends BaseEntity {
      * 根评论总数
      */
     private Integer rootCount;
-
-    /**
-     * 版本号（用于乐观锁）
-     */
-    private Integer version;
 }

@@ -6,9 +6,9 @@ REMOTE_PASSWORD="root"
 REMOTE_KILL_SCRIPT="/usr/local/jar/kill_process.sh"
 
 # 定义服务器IP数组
-REMOTE_IPS=("192.168.42.106" "192.168.42.234")
+REMOTE_IPS=("192.168.42.234")
 # 定义服务名数组  "line-gateway"  "search-line-es-core-service"
-SERVICE_NAMES=("search-line-file-service")
+SERVICE_NAMES=("line-gateway")
 
 # 遍历服务器IP数组
 for REMOTE_IP in "${REMOTE_IPS[@]}"; do
