@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://dubbo.apache.org/schema/dubbo
+       http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!-- 应用名称 -->
+    <!--    <dubbo:application name="${spring.application.name}"/>-->
+
+    <!-- 注册中心配置 -->
+    <!--    <dubbo:registry address="${dubbo.registry.address}" timeout="${dubbo.registry.timeout}"/>-->
+
+    <!-- 协议配置 -->
+    <dubbo:protocol name="${dubbo.protocol.name}" port="${dubbo.protocol.port}"/>
+
+    <!-- 服务配置 -->
+    <dubbo:service interface="top.boking.file.store.IFileStore"
+                   ref="minioFileStore"
+                   timeout="3000"
+                   retries="0"/>
+</beans>

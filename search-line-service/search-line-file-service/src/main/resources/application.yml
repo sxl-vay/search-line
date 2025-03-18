@@ -1,6 +1,6 @@
 spring:
   config:
-    import: classpath:config.yml
+    import: classpath:config.yml,classpath:dubbo.yml
   application:
     name: search-line-file-service
   servlet:
