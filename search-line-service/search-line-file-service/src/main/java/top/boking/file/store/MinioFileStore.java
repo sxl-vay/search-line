@@ -4,11 +4,11 @@ import io.minio.ObjectWriteResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import top.boking.file.domain.entity.SLineFile;
 import top.boking.file.utils.MinioUtils;
 
 import java.io.File;
+import java.io.InputStream;
 
 @Service
 @Slf4j
@@ -23,10 +23,10 @@ public class MinioFileStore implements IFileStore {
     }
 
     @Override
-    public boolean upload(SLineFile sLineFile, MultipartFile file) {
+    public boolean upload(SLineFile sLineFile, InputStream inputStream, long size) {
         // 上传文件
         try {
-            ObjectWriteResponse response = minioUtils.uploadFile(sLineFile.getStoreFileName(), file.getInputStream(), file.getSize(), sLineFile.getGmtCreate());
+            ObjectWriteResponse response = minioUtils.uploadFile(sLineFile.getStoreFileName(), inputStream, size, sLineFile.getGmtCreate());
             String url = minioUtils.generatePresignedUrl(sLineFile.getName(), sLineFile.getGmtCreate(), sLineFile.getStoreFileName(), -1, null);
             sLineFile.setStorePath(url);
         } catch (Exception e) {

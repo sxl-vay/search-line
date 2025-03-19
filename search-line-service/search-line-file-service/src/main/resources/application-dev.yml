@@ -2,4 +2,9 @@ spring:
   cloud:
     nacos:
       discovery:
-        ip: 2.0.20.124
+        ip: ${search-line.base.cur}
+dubbo:
+  protocol:
+    port: 50052
+  consumer:
+    check: true

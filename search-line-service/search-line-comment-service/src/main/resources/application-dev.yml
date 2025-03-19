@@ -2,4 +2,4 @@ spring:
   cloud:
     nacos:
       discovery:
-        ip: 2.0.20.112
+        ip: ${search-line.base.cur}

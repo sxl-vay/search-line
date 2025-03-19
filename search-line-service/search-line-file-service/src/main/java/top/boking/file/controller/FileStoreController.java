@@ -1,6 +1,5 @@
 package top.boking.file.controller;
 
-import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -38,7 +37,7 @@ public class FileStoreController {
     //根据id删除附件的接口
     @DeleteMapping("/delete/{id}")
     public SlineResult<Boolean> deleteById(@PathVariable("id") Long id) {
-        boolean b = sLineFileService.removeById(id);
+        boolean b = sLineFileService.deleteById(id);
         return SlineResult.success(b);
     }
 
@@ -49,7 +48,7 @@ public class FileStoreController {
 
 
     @GetMapping("/list")
-    @Cached(name = "file:list", expire = 3600, key = "{#current,#pageSize}")
+//    @Cached(name = "file:list", expire = 3600, key = "{#current,#pageSize}")
     public SlineResult<SlineFilePageRespose> list(@RequestParam("current") Long current, @RequestParam("pageSize") Long pageSize) {
         log.info("list:current:{},pageSize:{}", current, pageSize);
         QueryWrapper<SLineFile> queryWrapper = new QueryWrapper<>();

@@ -99,6 +99,13 @@
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
+                <groupId>top.boking</groupId>
+                <artifactId>search-line-es-core</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+
+
+            <dependency>
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
                 <version>2.0.43</version>

@@ -20,3 +20,6 @@ rocketmq:
   producer:
     group: file-service-producer-group
     send-message-timeout: 3000
+dubbo:
+  protocol:
+    port: 50052

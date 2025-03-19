@@ -4,13 +4,13 @@ search-line:
     zzy: 192.168.42.106
     dell: 192.168.42.234
     diy: 192.168.40.95
+    cur: 2.0.20.158
 spring:
   config:
     import: nacos:${spring.application.name},nacos:config.yml
   cloud:
     nacos:
       discovery:
-        #ip: 2.0.20.124
         server-addr: ${search-line.base.dell}:8848
         namespace: 20250215
       config:
@@ -22,7 +22,7 @@ spring:
           enabled: false
   data:
     redis:
-      host: 2.0.20.33
+      host: ${search-line.base.mac}
       port: 6379
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

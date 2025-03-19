@@ -12,6 +12,7 @@ import top.boking.file.service.SLineFileService;
 import top.boking.file.store.IFileStore;
 import top.boking.mq.annotation.SLineTransactionListener;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -47,11 +48,13 @@ public class PushFileMessageListener implements RocketMQLocalTransactionListener
             //1.业务处理
             postBusinessHandler(sLineFile);
             //2.上传文件到oss
-            fileStore.upload(sLineFile, file);
+            fileStore.upload(sLineFile, file.getInputStream(), file.getSize());
             log.info("本地事务执行成功，文件ID：{}", sLineFile.getId());
 
             //后置处理，异常不影响主业务流程
             afterHandler(sLineFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } finally {
             processingFiles.remove(sLineFile.getId());
         }

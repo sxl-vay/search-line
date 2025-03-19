@@ -7,6 +7,7 @@ import com.alicp.jetcache.template.QuickConfig;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.rocketmq.client.producer.LocalTransactionState;
 import org.apache.rocketmq.client.producer.TransactionSendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
@@ -14,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import top.boking.escore.service.KnowledgeBaseService;
 import top.boking.file.consts.MQConst;
 import top.boking.file.domain.entity.SLineFile;
 import top.boking.file.mq.msgholder.TransactionHolder;
@@ -30,6 +33,9 @@ public class SLineFileService extends SLineFileCoreService {
     @Autowired
     private CacheManager cacheManager;
 
+    @DubboReference
+    private KnowledgeBaseService knowledgeBaseService;
+
     @PostConstruct
     public void init() {
         QuickConfig quickConfig = QuickConfig.newBuilder("file:list")
@@ -42,6 +48,14 @@ public class SLineFileService extends SLineFileCoreService {
 
     public SLineFileService(RocketMQTemplate rocketMQTemplate) {
         this.rocketMQTemplate = rocketMQTemplate;
+    }
+
+    //根据id删除文件
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteById(Long id) {
+        removeById(id);
+        knowledgeBaseService.deleteById(String.valueOf(id));
+        return true;
     }
 
     public SLineFile uploadFile(MultipartFile multipartFile) {

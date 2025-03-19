@@ -21,3 +21,6 @@ logging:
   level:
     org.elasticsearch.client: DEBUG
     org.springframework.data.elasticsearch.core: DEBUG
+dubbo:
+  protocol:
+    port: 50051
