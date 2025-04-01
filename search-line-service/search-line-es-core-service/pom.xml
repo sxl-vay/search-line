@@ -112,6 +112,23 @@
             <groupId>top.boking</groupId>
             <artifactId>search-line-es-core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-tools</artifactId>
+            <version>5.1.4</version>
+        </dependency>
+
+
+        <!-- 示例：RocketMQ 5.x+ 版本（需确认具体版本） -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-acl</artifactId>
+        </dependency>
     </dependencies>
     <!-- pom.xml 示例 -->
     <build>

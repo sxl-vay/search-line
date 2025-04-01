@@ -9,6 +9,7 @@ import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.message.MessageQueue;
+import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,6 +32,8 @@ public class DeadLetterRetryScheduler {
 
     @Autowired
     private DefaultMQProducer producer;
+    @Autowired
+    private DefaultMQAdminExt adminExt;
 
     @Autowired
     private DeadLetterRecordRepository deadLetterRecordRepository;
@@ -40,13 +43,12 @@ public class DeadLetterRetryScheduler {
     // 每 5 分钟扫描一次死信队列
     @Scheduled(cron = "0 */1 * * * ?")
     public void retryDeadLetterMessages() {
-        pullConsumer.setPullBatchSize(1);
         List<MessageExt> messages = pullConsumer.poll(1000);
         if (!messages.isEmpty()) {
             for (MessageExt msg : messages) {
                 String msgStr = new String(msg.getBody());
                 log.error("拉取到消息: " + msgStr);
-                SLineFile sLineFile = null;
+                SLineFile sLineFile;
                 try {
                     sLineFile = JSON.parseObject(msgStr, SLineFile.class);
                     log.info("消息体转换为SLineFile对象成功: {}", sLineFile);

@@ -41,6 +41,7 @@ public class SearchCoreController {
                     Map<String, Object> result = new HashMap<>();
                     result.put("title", e.getFileName());
                     result.put("content", e.getFileContent());
+                    result.put("id", e.getId());
                     return result;
                 })
                 .toList();
