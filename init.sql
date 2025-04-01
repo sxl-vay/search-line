@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS `comment_index`
     `user_id`      bigint      NOT NULL COMMENT '用户ID',
     `root_id`      bigint      NOT NULL DEFAULT 0 COMMENT '根评论ID',
     `parent_id`    bigint      NOT NULL DEFAULT 0 COMMENT '父评论ID',
+    `attrs`            text     COMMENT '评论属性',
     `like_count`   int         NOT NULL DEFAULT 0 COMMENT '点赞数',
     `lock_version` int         NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
     `deleted`      tinyint     NOT NULL DEFAULT 0 COMMENT '是否删除',

@@ -42,8 +42,4 @@ public class CommentIndex extends BaseEntity {
      */
     private String attrs;
 
-    /**
-     * 版本号（用于乐观锁）
-     */
-    private Integer version;
 }

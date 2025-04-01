@@ -45,9 +45,9 @@ public class CommentController {
     @GetMapping("/list")
     public SlineResult<List<CommentIndex>> getCommentList(
             @Parameter(description = "评论对象ID") @RequestParam String objId,
-            @Parameter(description = "页码") @RequestParam Integer page,
-            @Parameter(description = "每页大小") @RequestParam Integer size) {
-        return SlineResult.success(commentService.getCommentList(objId, page, size));
+            @Parameter(description = "页码") @RequestParam Integer pageNum,
+            @Parameter(description = "每页大小") @RequestParam Integer pageSize) {
+        return SlineResult.success(commentService.getCommentList(objId, pageNum, pageSize));
     }
 
     @Operation(summary = "获取评论内容")

@@ -22,5 +22,9 @@ spring:
           uri: lb://search-line-user-service
           predicates:
             - Path=/api/user/**
+        - id: search-line-comment-service
+          uri: lb://search-line-comment-service
+          predicates:
+            - Path=/api/comment/**
   application:
     name: line-gateway
