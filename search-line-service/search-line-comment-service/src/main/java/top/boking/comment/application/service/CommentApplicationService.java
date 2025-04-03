@@ -3,7 +3,6 @@ package top.boking.comment.application.service;
 import org.springframework.stereotype.Service;
 import top.boking.comment.application.dto.CommentEntityDTO;
 import top.boking.comment.domain.model.CommentContent;
-import top.boking.comment.domain.model.CommentIndex;
 import top.boking.comment.domain.service.CommentService;
 
 import java.util.List;
@@ -24,8 +23,8 @@ public class CommentApplicationService {
         return commentService.replyComment(commentEntityDTO);
     }
 
-    public List<CommentEntityDTO> getCommentList(String objId, Integer pageNum, Integer pageSize) {
-        return commentService.getCommentList(objId, pageNum, pageSize);
+    public List<CommentEntityDTO> getCommentList(String objId, Long rootId, Integer pageNum, Integer pageSize) {
+        return commentService.getCommentList(objId, rootId, pageNum, pageSize);
     }
 
     public CommentContent getCommentContent(Long commentId) {

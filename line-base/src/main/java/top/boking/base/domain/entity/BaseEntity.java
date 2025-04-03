@@ -1,8 +1,11 @@
 package top.boking.base.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+import top.boking.base.config.DateSerializer;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -42,12 +45,14 @@ public class BaseEntity implements Serializable {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
+    @JsonSerialize(using = DateSerializer.class)
     private Date gmtCreate = new Date();
 
     /**
      * 修改时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
+    @JsonSerialize(using = DateSerializer.class)
     private Date gmtModified;
 
     public Long getId() {
@@ -74,21 +79,6 @@ public class BaseEntity implements Serializable {
         this.lockVersion = lockVersion;
     }
 
-    public Date getGmtCreate() {
-        return gmtCreate;
-    }
-
-    public void setGmtCreate(Date gmtCreate) {
-        this.gmtCreate = gmtCreate;
-    }
-
-    public Date getGmtModified() {
-        return gmtModified;
-    }
-
-    public void setGmtModified(Date gmtModified) {
-        this.gmtModified = gmtModified;
-    }
 
     @Override
     public String toString() {

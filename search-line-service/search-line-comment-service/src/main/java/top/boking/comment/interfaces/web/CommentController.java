@@ -8,8 +8,6 @@ import top.boking.base.vo.SlineResult;
 import top.boking.comment.application.dto.CommentEntityDTO;
 import top.boking.comment.application.service.CommentApplicationService;
 import top.boking.comment.domain.model.CommentContent;
-import top.boking.comment.domain.model.CommentIndex;
-import top.boking.comment.domain.service.CommentService;
 import top.boking.comment.interfaces.dto.request.PushCommentRequest;
 
 import java.util.List;
@@ -41,9 +39,10 @@ public class CommentController {
     @GetMapping("/list")
     public SlineResult<List<CommentEntityDTO>> getCommentList(
             @Parameter(description = "评论对象ID") @RequestParam String objId,
+            @Parameter(description = "父评论ID") @RequestParam(required = false, defaultValue = "0") Long rootId,
             @Parameter(description = "页码") @RequestParam Integer pageNum,
             @Parameter(description = "每页大小") @RequestParam Integer pageSize) {
-        return SlineResult.success(commentService.getCommentList(objId, pageNum, pageSize));
+        return SlineResult.success(commentService.getCommentList(objId, rootId, pageNum, pageSize));
     }
 
     @Operation(summary = "获取评论内容")

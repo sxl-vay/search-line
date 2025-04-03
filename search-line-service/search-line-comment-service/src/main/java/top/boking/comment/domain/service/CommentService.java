@@ -2,7 +2,6 @@ package top.boking.comment.domain.service;
 
 import top.boking.comment.application.dto.CommentEntityDTO;
 import top.boking.comment.domain.model.CommentContent;
-import top.boking.comment.domain.model.CommentIndex;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ public interface CommentService {
      * @param size  每页大小
      * @return 评论列表
      */
-    List<CommentEntityDTO> getCommentList(String objId, Integer page, Integer size);
+    List<CommentEntityDTO> getCommentList(String objId, Long rootId, Integer page, Integer size);
 
     /**
      * 获取评论内容

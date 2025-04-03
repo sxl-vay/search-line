@@ -2,8 +2,10 @@ package top.boking.comment.domain.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import org.jboss.marshalling.SimpleDataInput;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.boking.base.util.GlobalDataFormatTemplate;
 import top.boking.comment.application.dto.CommentEntityDTO;
 import top.boking.comment.domain.model.CommentContent;
 import top.boking.comment.domain.model.CommentIndex;
@@ -17,6 +19,7 @@ import top.boking.comment.domain.repository.UserLikeMapper;
 import top.boking.user.domain.entity.User;
 import top.boking.user.utils.UserContext;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -120,9 +123,15 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentEntityDTO> getCommentList(String objId, Integer page, Integer size) {
-
-        List<CommentIndex> commentIndices = indexMapper.selectList(new LambdaQueryWrapper<CommentIndex>().eq(CommentIndex::getObjId, objId).orderByDesc(CommentIndex::getGmtCreate).last(String.format("LIMIT %d, %d", (page - 1) * size, size)));
+    public List<CommentEntityDTO> getCommentList(String objId, Long rootId, Integer page, Integer size) {
+        LambdaQueryWrapper<CommentIndex> lqw = new LambdaQueryWrapper<CommentIndex>()
+                .eq(CommentIndex::getObjId, objId)
+                .orderByDesc(CommentIndex::getGmtCreate)
+                .last(String.format("LIMIT %d, %d", (page - 1) * size, size));
+        if (rootId != null) {
+            lqw.eq(CommentIndex::getRootId, rootId);
+        }
+        List<CommentIndex> commentIndices = indexMapper.selectList(lqw);
 
         List<Long> indexIds = commentIndices.stream().map(CommentIndex::getId).toList();
         if (indexIds.isEmpty()) {
@@ -136,6 +145,7 @@ public class CommentServiceImpl implements CommentService {
         return commentIndices.stream().map(commentIndex -> getCommentEntityDTO(commentIndex, commentMap)).toList();
     }
 
+
     private static CommentEntityDTO getCommentEntityDTO(CommentIndex commentIndex, Map<Long, CommentContent> commentMap) {
         CommentEntityDTO commentEntityDTO = new CommentEntityDTO();
         commentEntityDTO.setId(commentIndex.getId());
@@ -144,6 +154,10 @@ public class CommentServiceImpl implements CommentService {
         commentEntityDTO.setRootId(commentIndex.getRootId());
         commentEntityDTO.setParentId(commentIndex.getParentId());
         commentEntityDTO.setLikeCount(commentIndex.getLikeCount());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(GlobalDataFormatTemplate.DATE_FORMAT);
+        commentEntityDTO.setGmtCreate(simpleDateFormat.format(commentIndex.getGmtCreate()));
+        commentEntityDTO.setGmtModified(simpleDateFormat.format(commentIndex.getGmtModified()));
+        commentEntityDTO.setAuthor(commentIndex.getId()+"");
         CommentContent commentContent = commentMap.get(commentIndex.getId());
         if (commentContent == null) {
             return commentEntityDTO;
