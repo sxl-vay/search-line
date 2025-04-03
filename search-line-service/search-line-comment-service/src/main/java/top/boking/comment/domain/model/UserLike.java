@@ -1,4 +1,4 @@
-package top.boking.comment.entity;
+package top.boking.comment.domain.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;

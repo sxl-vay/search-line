@@ -1,8 +1,8 @@
-package top.boking.comment.mapper;
+package top.boking.comment.domain.repository;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import top.boking.comment.entity.CommentContent;
+import top.boking.comment.domain.model.CommentContent;
 
 @Mapper
 public interface CommentContentMapper extends BaseMapper<CommentContent> {

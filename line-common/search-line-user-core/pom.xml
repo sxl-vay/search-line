@@ -51,5 +51,9 @@
             <groupId>top.boking</groupId>
             <artifactId>line-base</artifactId>
         </dependency>
+        <dependency>
+            <groupId>top.boking</groupId>
+            <artifactId>search-line-user-core</artifactId>
+        </dependency>
     </dependencies>
 </project>

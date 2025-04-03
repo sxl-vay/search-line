@@ -3,3 +3,6 @@ spring:
     nacos:
       discovery:
         ip: ${search-line.base.cur}
+dubbo:
+  application:
+    qos-port: 22223

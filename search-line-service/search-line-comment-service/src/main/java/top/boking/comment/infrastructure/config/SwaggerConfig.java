@@ -1,4 +1,4 @@
-package top.boking.comment.config;
+package top.boking.comment.infrastructure.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

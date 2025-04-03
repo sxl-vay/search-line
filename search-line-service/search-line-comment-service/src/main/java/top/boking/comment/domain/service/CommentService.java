@@ -1,7 +1,8 @@
-package top.boking.comment.service;
+package top.boking.comment.domain.service;
 
-import top.boking.comment.entity.CommentContent;
-import top.boking.comment.entity.CommentIndex;
+import top.boking.comment.application.dto.CommentEntityDTO;
+import top.boking.comment.domain.model.CommentContent;
+import top.boking.comment.domain.model.CommentIndex;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface CommentService {
      * @param content 评论内容
      * @return 评论ID
      */
-    Long publishComment(String objId, Long userId, String content);
+    Long publishComment(CommentEntityDTO commentEntityDTO);
 
     /**
      * 回复评论
@@ -26,7 +27,7 @@ public interface CommentService {
      * @param parentId 父评论ID
      * @return 评论ID
      */
-    Long replyComment(String objId, Long userId, String content, Long rootId, Long parentId);
+    Long replyComment(CommentEntityDTO commentEntityDTO);
 
     /**
      * 获取评论列表
@@ -36,7 +37,7 @@ public interface CommentService {
      * @param size  每页大小
      * @return 评论列表
      */
-    List<CommentIndex> getCommentList(String objId, Integer page, Integer size);
+    List<CommentEntityDTO> getCommentList(String objId, Integer page, Integer size);
 
     /**
      * 获取评论内容

@@ -1,20 +1,26 @@
-package top.boking.comment.service.impl;
+package top.boking.comment.domain.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import top.boking.comment.entity.CommentContent;
-import top.boking.comment.entity.CommentIndex;
-import top.boking.comment.entity.CommentSubject;
-import top.boking.comment.entity.UserLike;
-import top.boking.comment.mapper.CommentContentMapper;
-import top.boking.comment.mapper.CommentIndexMapper;
-import top.boking.comment.mapper.CommentSubjectMapper;
-import top.boking.comment.mapper.UserLikeMapper;
-import top.boking.comment.service.CommentService;
+import top.boking.comment.application.dto.CommentEntityDTO;
+import top.boking.comment.domain.model.CommentContent;
+import top.boking.comment.domain.model.CommentIndex;
+import top.boking.comment.domain.model.CommentSubject;
+import top.boking.comment.domain.model.UserLike;
+import top.boking.comment.domain.service.CommentService;
+import top.boking.comment.domain.repository.CommentContentMapper;
+import top.boking.comment.domain.repository.CommentIndexMapper;
+import top.boking.comment.domain.repository.CommentSubjectMapper;
+import top.boking.comment.domain.repository.UserLikeMapper;
+import top.boking.user.domain.entity.User;
+import top.boking.user.utils.UserContext;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -23,10 +29,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentContentMapper contentMapper;
     private final UserLikeMapper userLikeMapper;
 
-    public CommentServiceImpl(CommentSubjectMapper subjectMapper,
-                              CommentIndexMapper indexMapper,
-                              CommentContentMapper contentMapper,
-                              UserLikeMapper userLikeMapper) {
+    public CommentServiceImpl(CommentSubjectMapper subjectMapper, CommentIndexMapper indexMapper, CommentContentMapper contentMapper, UserLikeMapper userLikeMapper) {
         this.subjectMapper = subjectMapper;
         this.indexMapper = indexMapper;
         this.contentMapper = contentMapper;
@@ -35,7 +38,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long publishComment(String objId, Long userId, String content) {
+    public Long publishComment(CommentEntityDTO commentEntityDTO) {
+        User user = UserContext.getCurrentUser();
+
+        String objId = commentEntityDTO.getObjId();
+        Long userId = user.getId();
+        String content = commentEntityDTO.getContent();
+
         // 创建评论索引
         CommentIndex index = new CommentIndex();
         index.setId(IdWorker.getId());
@@ -54,8 +63,7 @@ public class CommentServiceImpl implements CommentService {
         contentMapper.insert(commentContent);
 
         // 更新主题统计
-        CommentSubject subject = subjectMapper.selectOne(
-                new LambdaQueryWrapper<CommentSubject>().eq(CommentSubject::getObjId, objId));
+        CommentSubject subject = subjectMapper.selectOne(new LambdaQueryWrapper<CommentSubject>().eq(CommentSubject::getObjId, objId));
         if (subject == null) {
             subject = new CommentSubject();
             subject.setId(IdWorker.getId());
@@ -75,7 +83,15 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long replyComment(String objId, Long userId, String content, Long rootId, Long parentId) {
+    public Long replyComment(CommentEntityDTO commentEntityDTO) {
+        User user = UserContext.getCurrentUser();
+
+        String objId = commentEntityDTO.getObjId();
+        Long userId = user.getId();
+        String content = commentEntityDTO.getContent();
+        Long rootId = commentEntityDTO.getRootId();
+        Long parentId = commentEntityDTO.getParentId();
+
         // 创建评论索引
         CommentIndex index = new CommentIndex();
         index.setId(IdWorker.getId());
@@ -94,8 +110,7 @@ public class CommentServiceImpl implements CommentService {
         contentMapper.insert(commentContent);
 
         // 更新主题统计
-        CommentSubject subject = subjectMapper.selectOne(
-                new LambdaQueryWrapper<CommentSubject>().eq(CommentSubject::getObjId, objId));
+        CommentSubject subject = subjectMapper.selectOne(new LambdaQueryWrapper<CommentSubject>().eq(CommentSubject::getObjId, objId));
         if (subject != null) {
             subject.setCount(subject.getCount() + 1);
             subjectMapper.updateById(subject);
@@ -105,29 +120,49 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentIndex> getCommentList(String objId, Integer page, Integer size) {
-        return indexMapper.selectList(
-                new LambdaQueryWrapper<CommentIndex>()
-                        .eq(CommentIndex::getObjId, objId)
-                        .orderByDesc(CommentIndex::getGmtCreate)
-                        .last(String.format("LIMIT %d, %d", (page - 1) * size, size)));
+    public List<CommentEntityDTO> getCommentList(String objId, Integer page, Integer size) {
+
+        List<CommentIndex> commentIndices = indexMapper.selectList(new LambdaQueryWrapper<CommentIndex>().eq(CommentIndex::getObjId, objId).orderByDesc(CommentIndex::getGmtCreate).last(String.format("LIMIT %d, %d", (page - 1) * size, size)));
+
+        List<Long> indexIds = commentIndices.stream().map(CommentIndex::getId).toList();
+        if (indexIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<CommentContent> commentContents = contentMapper.selectList(new LambdaQueryWrapper<CommentContent>().in(CommentContent::getCommentIndexId, indexIds));
+
+        Map<Long, CommentContent> commentMap = commentContents.stream().collect(Collectors.toMap(CommentContent::getCommentIndexId, commentContent -> commentContent));
+
+        return commentIndices.stream().map(commentIndex -> getCommentEntityDTO(commentIndex, commentMap)).toList();
+    }
+
+    private static CommentEntityDTO getCommentEntityDTO(CommentIndex commentIndex, Map<Long, CommentContent> commentMap) {
+        CommentEntityDTO commentEntityDTO = new CommentEntityDTO();
+        commentEntityDTO.setId(commentIndex.getId());
+        commentEntityDTO.setObjId(commentIndex.getObjId());
+        commentEntityDTO.setUserId(commentIndex.getUserId());
+        commentEntityDTO.setRootId(commentIndex.getRootId());
+        commentEntityDTO.setParentId(commentIndex.getParentId());
+        commentEntityDTO.setLikeCount(commentIndex.getLikeCount());
+        CommentContent commentContent = commentMap.get(commentIndex.getId());
+        if (commentContent == null) {
+            return commentEntityDTO;
+        }
+        String content = commentContent.getContent();
+        commentEntityDTO.setContent(content);
+        return commentEntityDTO;
     }
 
     @Override
     public CommentContent getCommentContent(Long commentId) {
-        return contentMapper.selectOne(
-                new LambdaQueryWrapper<CommentContent>()
-                        .eq(CommentContent::getCommentIndexId, commentId));
+        return contentMapper.selectOne(new LambdaQueryWrapper<CommentContent>().eq(CommentContent::getCommentIndexId, commentId));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean likeComment(Long commentId, Long userId) {
         // 检查是否已点赞
-        UserLike userLike = userLikeMapper.selectOne(
-                new LambdaQueryWrapper<UserLike>()
-                        .eq(UserLike::getUserId, userId)
-                        .eq(UserLike::getCommentId, commentId));
+        UserLike userLike = userLikeMapper.selectOne(new LambdaQueryWrapper<UserLike>().eq(UserLike::getUserId, userId).eq(UserLike::getCommentId, commentId));
         if (userLike == null) {
             // 创建点赞记录
             userLike = new UserLike();
@@ -151,10 +186,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(rollbackFor = Exception.class)
     public boolean unlikeComment(Long commentId, Long userId) {
         // 检查是否已点赞
-        UserLike userLike = userLikeMapper.selectOne(
-                new LambdaQueryWrapper<UserLike>()
-                        .eq(UserLike::getUserId, userId)
-                        .eq(UserLike::getCommentId, commentId));
+        UserLike userLike = userLikeMapper.selectOne(new LambdaQueryWrapper<UserLike>().eq(UserLike::getUserId, userId).eq(UserLike::getCommentId, commentId));
         if (userLike != null) {
             // 删除点赞记录
             userLikeMapper.deleteById(userLike.getId());
