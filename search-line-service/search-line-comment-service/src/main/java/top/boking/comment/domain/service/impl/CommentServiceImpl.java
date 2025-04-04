@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -124,10 +125,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentEntityDTO> getCommentList(String objId, Long parentId, Long rootId, Integer page, Integer size) {
-        LambdaQueryWrapper<CommentIndex> lqw = new LambdaQueryWrapper<CommentIndex>()
-                .eq(CommentIndex::getObjId, objId)
-                .orderByDesc(CommentIndex::getGmtCreate)
-                .last(String.format("LIMIT %d, %d", (page - 1) * size, size));
+        LambdaQueryWrapper<CommentIndex> lqw = new LambdaQueryWrapper<CommentIndex>().eq(CommentIndex::getObjId, objId).orderByDesc(CommentIndex::getGmtCreate).last(String.format("LIMIT %d, %d", (page - 1) * size, size));
         if (rootId != null) {
             lqw.eq(CommentIndex::getRootId, rootId);
         }
@@ -141,11 +139,29 @@ public class CommentServiceImpl implements CommentService {
             return Collections.emptyList();
         }
 
-        List<CommentContent> commentContents = contentMapper.selectList(new LambdaQueryWrapper<CommentContent>().in(CommentContent::getCommentIndexId, indexIds));
+        LambdaQueryWrapper<CommentContent> inWrapper = new LambdaQueryWrapper<CommentContent>().in(CommentContent::getCommentIndexId, indexIds);
+        List<CommentContent> commentContents = contentMapper.selectList(inWrapper);
 
         Map<Long, CommentContent> commentMap = commentContents.stream().collect(Collectors.toMap(CommentContent::getCommentIndexId, commentContent -> commentContent));
 
-        return commentIndices.stream().map(commentIndex -> getCommentEntityDTO(commentIndex, commentMap)).toList();
+        List<CommentEntityDTO> list = commentIndices.stream().map(commentIndex -> getCommentEntityDTO(commentIndex, commentMap)).toList();
+
+        if (Objects.equals(rootId, 0L)) {
+            fullingSubCommentCount(objId, rootId, indexIds, list);
+        }
+
+        return list;
+    }
+
+    private void fullingSubCommentCount(String objId, Long rootId, List<Long> indexIds, List<CommentEntityDTO> list) {
+
+        List<Map<String, Object>> subCommentIdWithObjAndRootIds = indexMapper.getSubCommentIdWithObjAndRootIds(objId, indexIds);
+        Map<Long, Long> rootIdToCountMap = subCommentIdWithObjAndRootIds.stream().collect(Collectors.toMap(k -> (Long) k.get("root_id"), v -> (Long) v.get("sub_comment_count")));
+        list.forEach(commentEntityDTO -> {
+            Long count = rootIdToCountMap.get(commentEntityDTO.getRootId());
+            commentEntityDTO.setSubCommentCount(count == null ? 0 : count.intValue());
+        });
+
     }
 
 
@@ -160,7 +176,7 @@ public class CommentServiceImpl implements CommentService {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(GlobalDataFormatTemplate.DATE_FORMAT);
         commentEntityDTO.setGmtCreate(simpleDateFormat.format(commentIndex.getGmtCreate()));
         commentEntityDTO.setGmtModified(simpleDateFormat.format(commentIndex.getGmtModified()));
-        commentEntityDTO.setAuthor(commentIndex.getId()+"");
+        commentEntityDTO.setAuthor(commentIndex.getId() + "");
         CommentContent commentContent = commentMap.get(commentIndex.getId());
         if (commentContent == null) {
             return commentEntityDTO;

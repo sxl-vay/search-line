@@ -13,6 +13,7 @@
         <result column="gmt_modified" property="gmtModified"/>
     </resultMap>
 
+
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
@@ -35,6 +36,16 @@
         FROM comment_index
         WHERE root_id = #{rootId}
         ORDER BY gmt_create ASC
+    </select>
+
+    <!-- 查询对应根评论下的子评论数量-->
+    <select id="getSubCommentIdWithObjAndRootIds" resultType="map">
+        select count(1) as sub_comment_count,root_id from comment_index
+        where obj_id = #{objId} and root_id in
+        <foreach collection="rootIds" item="rootId" open="(" separator="," close=")">
+            #{rootId}
+        </foreach>
+        group by root_id
     </select>
 
     <!-- 更新点赞数 -->
