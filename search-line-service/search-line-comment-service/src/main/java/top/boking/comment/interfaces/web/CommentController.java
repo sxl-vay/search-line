@@ -39,10 +39,11 @@ public class CommentController {
     @GetMapping("/list")
     public SlineResult<List<CommentEntityDTO>> getCommentList(
             @Parameter(description = "评论对象ID") @RequestParam String objId,
-            @Parameter(description = "父评论ID") @RequestParam(required = false, defaultValue = "0") Long rootId,
+            @Parameter(description = "根评论ID") @RequestParam(required = false) Long rootId,
+            @Parameter(description = "父评论ID") @RequestParam(required = false) Long parentId,
             @Parameter(description = "页码") @RequestParam Integer pageNum,
             @Parameter(description = "每页大小") @RequestParam Integer pageSize) {
-        return SlineResult.success(commentService.getCommentList(objId, rootId, pageNum, pageSize));
+        return SlineResult.success(commentService.getCommentList(objId, parentId, rootId, pageNum, pageSize));
     }
 
     @Operation(summary = "获取评论内容")
@@ -66,5 +67,17 @@ public class CommentController {
             @Parameter(description = "评论ID") @RequestParam Long commentId,
             @Parameter(description = "用户ID") @RequestParam Long userId) {
         return SlineResult.success(commentService.unlikeComment(commentId, userId));
+    }
+
+    // 统计评论数量
+    @GetMapping("/count/{objId}")
+    public SlineResult<Long> countCommentWithObj(@PathVariable String objId) {
+        return SlineResult.success(commentService.countCommentWithObj(objId));
+    }
+
+    // 统计根评论下的所有评论数量
+    @GetMapping("/count/{objId}/{rootId}")
+    public SlineResult<Long> countCommentWithRoot(@PathVariable String objId, @PathVariable Long rootId) {
+        return SlineResult.success(commentService.countCommentWithRoot(objId, rootId));
     }
 }

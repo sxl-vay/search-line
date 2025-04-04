@@ -36,7 +36,7 @@ public interface CommentService {
      * @param size  每页大小
      * @return 评论列表
      */
-    List<CommentEntityDTO> getCommentList(String objId, Long rootId, Integer page, Integer size);
+    List<CommentEntityDTO> getCommentList(String objId, Long parentId, Long rootId, Integer page, Integer size);
 
     /**
      * 获取评论内容
@@ -63,4 +63,8 @@ public interface CommentService {
      * @return 是否成功
      */
     boolean unlikeComment(Long commentId, Long userId);
+
+    Long countCommentWithObj(String objId);
+
+    Long countCommentWithRoot(String objId, Long rootId);
 }

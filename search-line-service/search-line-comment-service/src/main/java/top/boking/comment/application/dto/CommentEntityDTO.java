@@ -1,14 +1,10 @@
 package top.boking.comment.application.dto;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import top.boking.base.config.DateSerializer;
 
 import java.io.Serializable;
-import java.util.Date;
 
 @Data
 public class CommentEntityDTO implements Serializable {

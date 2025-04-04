@@ -23,8 +23,8 @@ public class CommentApplicationService {
         return commentService.replyComment(commentEntityDTO);
     }
 
-    public List<CommentEntityDTO> getCommentList(String objId, Long rootId, Integer pageNum, Integer pageSize) {
-        return commentService.getCommentList(objId, rootId, pageNum, pageSize);
+    public List<CommentEntityDTO> getCommentList(String objId, Long parentId, Long rootId, Integer pageNum, Integer pageSize) {
+        return commentService.getCommentList(objId, parentId, rootId, pageNum, pageSize);
     }
 
     public CommentContent getCommentContent(Long commentId) {
@@ -37,5 +37,13 @@ public class CommentApplicationService {
 
     public Boolean unlikeComment(Long commentId, Long userId) {
         return commentService.unlikeComment(commentId, userId);
+    }
+
+    public Long countCommentWithObj(String objId) {
+        return commentService.countCommentWithObj(objId);
+    }
+
+    public Long countCommentWithRoot(String objId, Long rootId) {
+        return commentService.countCommentWithRoot(objId, rootId);
     }
 }

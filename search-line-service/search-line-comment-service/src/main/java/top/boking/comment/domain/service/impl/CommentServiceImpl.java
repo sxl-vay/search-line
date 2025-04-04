@@ -123,13 +123,16 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentEntityDTO> getCommentList(String objId, Long rootId, Integer page, Integer size) {
+    public List<CommentEntityDTO> getCommentList(String objId, Long parentId, Long rootId, Integer page, Integer size) {
         LambdaQueryWrapper<CommentIndex> lqw = new LambdaQueryWrapper<CommentIndex>()
                 .eq(CommentIndex::getObjId, objId)
                 .orderByDesc(CommentIndex::getGmtCreate)
                 .last(String.format("LIMIT %d, %d", (page - 1) * size, size));
         if (rootId != null) {
             lqw.eq(CommentIndex::getRootId, rootId);
+        }
+        if (parentId != null) {
+            lqw.eq(CommentIndex::getParentId, parentId);
         }
         List<CommentIndex> commentIndices = indexMapper.selectList(lqw);
 
@@ -214,5 +217,21 @@ public class CommentServiceImpl implements CommentService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Long countCommentWithObj(String objId) {
+        if (objId != null) {
+            return indexMapper.selectCount(new LambdaQueryWrapper<CommentIndex>().eq(CommentIndex::getObjId, objId));
+        }
+        return null;
+    }
+
+    @Override
+    public Long countCommentWithRoot(String objId, Long rootId) {
+        if (objId != null && rootId != null) {
+            return indexMapper.selectCount(new LambdaQueryWrapper<CommentIndex>().eq(CommentIndex::getObjId, objId).eq(CommentIndex::getRootId, rootId));
+        }
+        return null;
     }
 }
