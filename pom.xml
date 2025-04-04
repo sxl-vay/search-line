@@ -80,6 +80,11 @@
             </dependency>
             <dependency>
                 <groupId>top.boking</groupId>
+                <artifactId>search-line-log</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>top.boking</groupId>
                 <artifactId>search-line-cache</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>

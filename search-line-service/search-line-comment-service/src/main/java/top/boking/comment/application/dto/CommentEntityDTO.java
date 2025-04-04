@@ -35,5 +35,7 @@ public class CommentEntityDTO implements Serializable {
 
     private String gmtModified;
 
+    private Integer subCommentCount;
+
 
 }

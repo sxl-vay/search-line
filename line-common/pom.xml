@@ -15,6 +15,7 @@
         <module>search-line-dubbo</module>
         <module>search-line-lock</module>
         <module>search-line-mq</module>
+        <module>search-line-log</module>
     </modules>
 
     <properties>
