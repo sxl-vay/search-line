@@ -3,7 +3,7 @@ package top.boking.chat.domain.entity;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @Builder
@@ -18,5 +18,5 @@ public class ChatRoomEntity {
     private String roomCreateTime;
     private String roomUpdateTime;
     private String roomDeleteTime;
-    private Map<String/*memberId*/, ChatRoomMemberEntity> members;
+    private ConcurrentHashMap<String/*memberId*/, ChatRoomMemberEntity> members;
 }

@@ -4,7 +4,7 @@ import com.corundumstudio.socketio.SocketIOServer;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import top.boking.chat.handler.SocketIOEventHandler;
+import top.boking.chat.infrastructure.handler.SocketIOEventHandler;
 
 @SpringBootApplication
 public class SearchLineChatServiceApplication implements CommandLineRunner {

@@ -1,4 +1,4 @@
-package top.boking.chat.handler;
+package top.boking.chat.infrastructure.handler;
 
 import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.SocketIOClient;
@@ -9,19 +9,26 @@ import com.corundumstudio.socketio.annotation.OnEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import top.boking.chat.domain.dto.MessageDataDTO;
+import top.boking.chat.domain.entity.ChatRoomEntity;
+import top.boking.chat.domain.entity.ChatRoomMemberEntity;
+import top.boking.chat.infrastructure.RoomHolder;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
 public class SocketIOEventHandler {
 
     private final SocketIOServer server;
-    private final Map<String, Map<String, Object>> rooms = new ConcurrentHashMap<>();
 
-    public SocketIOEventHandler(SocketIOServer server) {
+    private final RoomHolder roomHolder;
+
+    private final Map<String, ChatRoomEntity> rooms;
+
+    public SocketIOEventHandler(SocketIOServer server, RoomHolder roomHolder) {
         this.server = server;
+        this.roomHolder = roomHolder;
+        this.rooms = roomHolder.getRooms();
     }
 
     @OnConnect
@@ -33,12 +40,13 @@ public class SocketIOEventHandler {
     public void onDisconnect(SocketIOClient client) {
         log.info("用户 " + client.getSessionId() + " 断开");
         // 从所有房间中移除该用户
-        for (Map.Entry<String, Map<String, Object>> entry : rooms.entrySet()) {
+        for (Map.Entry<String, ChatRoomEntity> entry : rooms.entrySet()) {
             String sessionId = client.getSessionId().toString();
-            if (entry.getValue().containsKey(sessionId)) {
-                entry.getValue().remove(sessionId);
-                if (entry.getValue().isEmpty()) {
-                    log.info("销毁房间 " + entry.getKey());
+            ChatRoomEntity room = entry.getValue();
+            Map<String, ChatRoomMemberEntity> members = room.getMembers();
+            if (members.containsKey(sessionId)) {
+                members.remove(sessionId);
+                if (members.isEmpty()) {
                     rooms.remove(entry.getKey());
                 }
             }
@@ -52,11 +60,11 @@ public class SocketIOEventHandler {
         log.info("用户 " + client.getSessionId() + " 加入展厅 " + roomId);
 
         // 初始化房间
-        rooms.putIfAbsent(roomId, new ConcurrentHashMap<>());
-        Map<String, Object> roomState = rooms.get(roomId);
+        ChatRoomEntity roomEntity = ChatRoomEntity.builder().roomId(roomId).build();
+        rooms.putIfAbsent(roomId, roomEntity);
 
         // 发送回调给加入的用户
-        client.sendEvent("join-room", client.getSessionId().toString(), roomState);
+        client.sendEvent("join-room", client.getSessionId().toString(), roomEntity);
 
         // 通知其他用户有新用户加入
         server.getRoomOperations(roomId).sendEvent("user-joined", client.getSessionId().toString());
@@ -85,28 +93,16 @@ public class SocketIOEventHandler {
 
     @OnEvent("update-state")
     public void onUpdateState(SocketIOClient client, MessageDataDTO<String> data) {
+        //todo
+
         // 获取用户所在的所有房间
-        for (String roomId : client.getAllRooms()) {
+        /*for (String roomId : client.getAllRooms()) {
+            Map<String, ChatRoomEntity> rooms = roomHolder.getRooms();
             if (rooms.containsKey(roomId)) {
                 rooms.get(roomId).put(client.getSessionId().toString(), data);
             }
-        }
+        }*/
     }
 
-
-    // 定时广播房间状态
-    public void broadcastRoomStates() {
-        log.info("广播房间状态");
-        rooms.forEach((roomId, state) -> {
-            BroadcastOperations roomOperations = server.getRoomOperations(roomId);
-            if (roomOperations.getClients().isEmpty()) {
-                log.info("房间 " + roomId + " 已被销毁");
-                rooms.remove(roomId);
-            } else {
-                log.info("房间 " + roomId + " 有 " + roomOperations.getClients().size() + " 个用户");
-            }
-            roomOperations.sendEvent("room-state", state);
-        });
-    }
 
 }

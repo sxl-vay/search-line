@@ -1,4 +1,4 @@
-package top.boking.chat.config;
+package top.boking.chat.infrastructure.config;
 
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
