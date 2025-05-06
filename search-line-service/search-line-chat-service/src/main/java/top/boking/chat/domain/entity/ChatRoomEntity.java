@@ -18,5 +18,5 @@ public class ChatRoomEntity {
     private String roomCreateTime;
     private String roomUpdateTime;
     private String roomDeleteTime;
-    private ConcurrentHashMap<String/*memberId*/, ChatRoomMemberEntity> members;
+    private ConcurrentHashMap<String/*memberId*/, ChatRoomMemberEntity> members = new ConcurrentHashMap<>();
 }
